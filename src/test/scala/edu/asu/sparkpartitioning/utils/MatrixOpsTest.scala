@@ -1,5 +1,6 @@
-package io.github.pratikbarhate.sparklingmatrixmultiplication.utils
+package edu.asu.sparkpartitioning.utils
 
+import edu.asu.sparkpartitioning.TestBase
 import io.github.pratikbarhate.sparklingmatrixmultiplication.TestBase
 import io.github.pratikbarhate.sparklingmatrixmultiplication.utils.MatrixOps._
 import org.apache.spark.mllib.linalg.distributed.MatrixEntry
@@ -44,7 +45,10 @@ class MatrixOpsTest extends TestBase {
   "Multiplication of pl0 and pr0" should "return e0 as the result" in {
     val t0 = pl0.multiply(pr0, numOfParts = 3)
     val res = t0.subtract(e0)
-    assert(res.count() == 0, "The paired matrix multiplication result is not as expected.")
+    assert(
+      res.count() == 0,
+      "The paired matrix multiplication result is not as expected."
+    )
   }
 
 }

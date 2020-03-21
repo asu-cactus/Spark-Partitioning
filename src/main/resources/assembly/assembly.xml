@@ -1,5 +1,4 @@
 <assembly>
-    <id>scala</id>
     <formats>
         <format>tar.gz</format>
     </formats>

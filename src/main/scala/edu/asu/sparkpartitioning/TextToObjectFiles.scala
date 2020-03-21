@@ -10,7 +10,7 @@ object TextToObjectFiles {
 
   def main(args: Array[String]): Unit = {
 
-    if (args.length != 3) {
+    if (args.length != 2) {
       throw new IllegalArgumentException(
         "Base path for storing data and spark history log directory are expected." +
           s"\nProvide: ${args.toList}"

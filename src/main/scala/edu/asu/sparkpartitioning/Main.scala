@@ -22,7 +22,7 @@ object Main {
     val basePath = args(0)
     val historyDir = args(1)
     val numOfParts = args(2).toInt
-    val experiment = args(4)
+    val experiment = args(3)
 
     Logger.getLogger("org.spark_project").setLevel(Level.WARN)
     Logger.getLogger("org.apache").setLevel(Level.WARN)

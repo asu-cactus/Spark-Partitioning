@@ -39,6 +39,4 @@ Investigating and benchmarking how partitioning of data on HDFS will affect Spar
 use merge strategy. Example command sequence would be:
     1. `git checkout ${YOUR_BRANCH}`
     2. `git merge test`
-3. When you want to push your changes to the shared/public branches, use rebase strategy. Example command sequence would be:
-    1. `git checkout ${YOUR_BRANCH}`
-    2. `git rebase test`
+3. When you want to push your changes to the shared/public branches, create a pull request on the shared/public branches (e.g. `test`)

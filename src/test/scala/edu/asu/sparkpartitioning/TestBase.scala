@@ -1,4 +1,4 @@
-package io.github.pratikbarhate.sparklingmatrixmultiplication
+package edu.asu.sparkpartitioning
 
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.{SparkConf, SparkContext}
@@ -11,6 +11,7 @@ trait TestBase extends AnyFlatSpec with Matchers {
   Logger.getLogger("akka").setLevel(Level.WARN)
   Logger.getLogger("com").setLevel(Level.WARN)
 
-  private val conf = new SparkConf().setAppName("TEST_matrix_multiplication").setMaster("local")
+  private val conf =
+    new SparkConf().setAppName("TEST_matrix_multiplication").setMaster("local")
   protected val sc: SparkContext = new SparkContext(conf)
 }

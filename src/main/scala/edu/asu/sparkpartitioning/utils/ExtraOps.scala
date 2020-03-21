@@ -1,4 +1,4 @@
-package io.github.pratikbarhate.sparklingmatrixmultiplication.utils
+package edu.asu.sparkpartitioning.utils
 
 object ExtraOps {
 

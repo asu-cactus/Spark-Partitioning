@@ -111,12 +111,12 @@ main() {
   rm $PWD/right_matrix.txt
 
   # running the spark command to convert txt files to objectfiles
-  spark-submit \
+  nohup spark-submit \
     --class edu.asu.sparkpartitioning.TextToObjectFiles \
     --master spark://172.31.19.91:7077 \
     --deploy-mode client \
     $APP_HOME/lib/Spark-Partitioning-0.1-SNAPSHOT.jar \
-    hdfs://172.31.19.91:9000$BASE_PATH hdfs://172.31.19.91:9000/spark/applicationHistory > parsing_logs.log 
+    hdfs://172.31.19.91:9000$BASE_PATH hdfs://172.31.19.91:9000/spark/applicationHistory > parsing_logs.log &
 }
 
 main $@

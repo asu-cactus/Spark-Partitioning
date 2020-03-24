@@ -4,29 +4,13 @@ Investigating and benchmarking how partitioning of data on HDFS will affect Spar
 
 #### Steps to execute the experiments.
 
-1. Build using the command - `mvn clean package`. It will create a tar.gz file named `Spark-Partitioning-0.1-SNAPSHOT.tar.gz` with the 4 directories `bin`, `etc`, `python` and `lib`. 
+1. Build using the command - `mvn clean package`. It will create a tar.gz file named `Spark-Partitioning-0.1-SNAPSHOT.tar.gz` with the 4 directories `bin`, `etc`, `python` and `lib`.
+Copy the `tar.gz` file to the cluster and decompress the folder.
 
-2. To parse the text files and create object files
+2. To create random matrices and load them to HDFS, execute the shell script `./bin/load_data.sh ${ROW_LEFT} {COL_LEFT} ${ROW_RIGHT} ${COL_RIGHT} ${BASE_PATH}`.
 
-    ```
-        nohup spark-submit \
-        --class edu.asu.sparkpartitioning.TextToObjectFiles \
-        --master spark://172.31.19.91:7077 \
-        --deploy-mode client \
-        ${PATH_TO_JAR}/Spark-Partitioning-0.1-SNAPSHOT.jar \
-        hdfs://172.31.19.91:9000/${BASE_PATH} hdfs://172.31.19.91:9000/spark/applicationHistory > parsing_logs.out &
-    ```
-   
-3. To execute a particular experiment
-
-    ```
-        nohup spark-submit \
-        --class edu.asu.sparkpartitioning.Main \
-        --master spark://172.31.19.91:7077 \
-        --deploy-mode client \
-        ${PATH_TO_JAR}/Spark-Partitioning-0.1-SNAPSHOT.jar \
-        hdfs://172.31.19.91:9000/${BASE_PATH} hdfs://172.31.19.91:9000/spark/applicationHistory ${NUM_PARTITION} ${EXPERIMENT} > job_logs_${NUM_PARTITION}.out &
-    ```
+3. To execute a particular experiment, execute the shell script `./bin/run_experiment.sh ${BASE_PATH} ${EXPERIMENT} ${NUM_OF_PARTITIONS}`.
+Allowed values for `${EXPERIMENT}` are `e1`, `e2` or `e3`. A file will be created with the name `job_${EXPERIMENT}_${PARTITIONS}.log`.
 
 **Code style notes**
 1. Python indentation and tabs = 4 spaces. (We are using Python 3)

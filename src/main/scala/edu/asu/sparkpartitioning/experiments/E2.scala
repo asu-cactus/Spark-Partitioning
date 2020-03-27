@@ -30,11 +30,11 @@ class E2(interNumParts: Int)(implicit sc: SparkContext) {
 
     val (_, timeToDisk: Long) = timedBlock {
       val left = sc
-        .objectFile[(Long, (Long, Double))](s"$basePath/common/left")
+        .objectFile[(Int, (Int, Double))](s"$basePath/common/left")
         .partitionBy(matPartitioner)
 
       val right = sc
-        .objectFile[(Long, (Long, Double))](s"$basePath/common/right")
+        .objectFile[(Int, (Int, Double))](s"$basePath/common/right")
         .partitionBy(matPartitioner)
 
       left.saveAsObjectFile(s"$basePath/e2/left")
@@ -50,9 +50,10 @@ class E2(interNumParts: Int)(implicit sc: SparkContext) {
     )
 
     val (_, timeToMultiply: Long) = timedBlock {
-      val leftMat = sc.objectFile[(Long, (Long, Double))](s"$basePath/e2/left")
+      val leftMat =
+        sc.objectFile[(Int, (Int, Double))](s"$basePath/e2/left")
       val rightMat =
-        sc.objectFile[(Long, (Long, Double))](s"$basePath/e2/right")
+        sc.objectFile[(Int, (Int, Double))](s"$basePath/e2/right")
 
       val res = leftMat.multiply(rightMat, interNumParts)
 

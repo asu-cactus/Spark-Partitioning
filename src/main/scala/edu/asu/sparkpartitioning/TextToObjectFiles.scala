@@ -1,9 +1,8 @@
 package edu.asu.sparkpartitioning
 
-import edu.asu.sparkpartitioning.utils.Parser.readMatrix
+import edu.asu.sparkpartitioning.utils.Parser.{readMatrix, MatrixEntry}
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.mllib.linalg.distributed.MatrixEntry
 import org.apache.spark.rdd.RDD
 
 object TextToObjectFiles {
@@ -23,6 +22,7 @@ object TextToObjectFiles {
     Logger.getLogger("org.apache").setLevel(Level.WARN)
     Logger.getLogger("akka").setLevel(Level.WARN)
     Logger.getLogger("com").setLevel(Level.WARN)
+    System.setProperty("spark.hadoop.dfs.replication", "1")
 
     val conf = new SparkConf()
       .setAppName("parsing_text_to_object_files")
@@ -33,9 +33,9 @@ object TextToObjectFiles {
 
     implicit val sc: SparkContext = new SparkContext(conf)
 
-    val left: RDD[(Long, (Long, Double))] = readMatrix(s"$basePath/raw/left")
+    val left: RDD[(Int, (Int, Double))] = readMatrix(s"$basePath/raw/left")
       .map({ case MatrixEntry(i, j, value) => (j, (i, value)) })
-    val right: RDD[(Long, (Long, Double))] = readMatrix(s"$basePath/raw/right")
+    val right: RDD[(Int, (Int, Double))] = readMatrix(s"$basePath/raw/right")
       .map({ case MatrixEntry(i, j, value) => (i, (j, value)) })
 
     left.saveAsObjectFile(s"$basePath/common/left")

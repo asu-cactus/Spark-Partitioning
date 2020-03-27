@@ -28,9 +28,10 @@ class E1(interNumParts: Int)(implicit sc: SparkContext) {
   def execute(basePath: String)(implicit log: Logger): Unit = {
 
     val (_, timeToDisk: Long) = timedBlock {
-      val left = sc.objectFile[(Long, (Long, Double))](s"$basePath/common/left")
+      val left =
+        sc.objectFile[(Int, (Int, Double))](s"$basePath/common/left")
       val right =
-        sc.objectFile[(Long, (Long, Double))](s"$basePath/common/right")
+        sc.objectFile[(Int, (Int, Double))](s"$basePath/common/right")
 
       left.saveAsObjectFile(s"$basePath/e1/left")
       right.saveAsObjectFile(s"$basePath/e1/right")
@@ -44,9 +45,9 @@ class E1(interNumParts: Int)(implicit sc: SparkContext) {
     )
 
     val (_, timeToMultiply: Long) = timedBlock {
-      val leftMat = sc.objectFile[(Long, (Long, Double))](s"$basePath/e1/left")
+      val leftMat = sc.objectFile[(Int, (Int, Double))](s"$basePath/e1/left")
       val rightMat =
-        sc.objectFile[(Long, (Long, Double))](s"$basePath/e1/right")
+        sc.objectFile[(Int, (Int, Double))](s"$basePath/e1/right")
 
       val res = leftMat.multiply(rightMat, interNumParts)
 

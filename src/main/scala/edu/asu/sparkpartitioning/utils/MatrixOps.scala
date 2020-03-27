@@ -1,27 +1,27 @@
 package edu.asu.sparkpartitioning.utils
 
-import org.apache.spark.mllib.linalg.distributed.MatrixEntry
+import edu.asu.sparkpartitioning.utils.Parser.MatrixEntry
 import org.apache.spark.rdd.RDD
 
 object MatrixOps {
 
   /**
    * NOTE: Structure of each element in the RDDs is as expected :-
-   * Left -> (Long, (Long, Double)) -> (colId, (rowID, value))
-   * Right -> (Long, (Long, Double)) -> (rowID, (colId, value))
+   * Left -> (Int, (Int, Double)) -> (colId, (rowID, value))
+   * Right -> (Int, (Int, Double)) -> (rowID, (colId, value))
    */
-  implicit class PairedOps(rdd: RDD[(Long, (Long, Double))])
+  implicit class PairedOps(rdd: RDD[(Int, (Int, Double))])
       extends Serializable {
     def multiply(
-      right: RDD[(Long, (Long, Double))],
+      right: RDD[(Int, (Int, Double))],
       numOfParts: Int
     ): RDD[MatrixEntry] = {
 
-      val joinedMatrices = rdd.join(right)
+      val joinedMatrices = rdd.join(right, numOfParts)
 
       joinedMatrices
         .map({ case (_, ((r, lv), (c, rv))) => ((r, c), lv * rv) })
-        .reduceByKey(_ + _)
+        .reduceByKey(_ + _, numOfParts)
         .map({ case ((r, c), sum) => MatrixEntry(r, c, sum) })
     }
   }

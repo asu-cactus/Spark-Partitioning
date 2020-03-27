@@ -42,7 +42,7 @@ main() {
 	PARTITIONS=$3
 
 	# spark command for running an experiment
-	nohup spark-submit \
+	spark-submit \
 	--class edu.asu.sparkpartitioning.Main \
 	--master spark://172.31.19.91:7077 \
 	--deploy-mode client \

@@ -111,16 +111,19 @@ main() {
   rm "${PWD}"/right_matrix.txt
 
   # running the spark command to convert txt files to objectfiles
-  nohup spark-submit \
-    --class edu.asu.sparkpartitioning.TextToObjectFiles \
-    --master spark://172.31.19.91:7077 \
-    --deploy-mode client \
-    "${APP_HOME}"/lib/Spark-Partitioning-0.1-SNAPSHOT.jar \
-    hdfs://172.31.19.91:9000"${BASE_PATH}" \
-    hdfs://172.31.19.91:9000/spark/applicationHistory > parsing_logs.log
+  spark-submit \
+  --class edu.asu.sparkpartitioning.TextToObjectFiles \
+  --master spark://172.31.19.91:7077 \
+  --deploy-mode client \
+  "${APP_HOME}"/lib/Spark-Partitioning-0.1-SNAPSHOT.jar \
+  hdfs://172.31.19.91:9000"${BASE_PATH}" \
+  hdfs://172.31.19.91:9000/spark/applicationHistory > parsing_logs.log
 
-    hdfs dfs -rm -r "${BASE_PATH}"/raw/left
-    hdfs dfs -rm -r "${BASE_PATH}"/raw/right
+  # Forcing the replication to be 1
+  hdfs dfs -setrep -w 1 "${BASE_PATH}"
+
+  hdfs dfs -rm -r "${BASE_PATH}"/raw/left
+  hdfs dfs -rm -r "${BASE_PATH}"/raw/right
 }
 
 main "${@}"

@@ -3,9 +3,9 @@ package edu.asu.sparkpartitioning
 import edu.asu.sparkpartitioning.experiments.{E1, E2, E3}
 import edu.asu.sparkpartitioning.utils.MatrixOps.PairedOps
 import edu.asu.sparkpartitioning.utils.MatrixPartitioners.IndexedPartitioner
+import edu.asu.sparkpartitioning.utils.Parser.MatrixEntry
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.mllib.linalg.distributed.MatrixEntry
 import org.apache.spark.rdd.RDD
 
 object Main {
@@ -30,6 +30,7 @@ object Main {
     Logger.getLogger("com").setLevel(Level.WARN)
 
     implicit val log: Logger = Logger.getLogger("MatrixMultiplication")
+    System.setProperty("spark.hadoop.dfs.replication", "1")
 
     val conf = new SparkConf()
       .setAppName("matrix_multiplication")

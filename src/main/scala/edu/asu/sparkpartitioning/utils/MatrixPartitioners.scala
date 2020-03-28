@@ -13,7 +13,7 @@ object MatrixPartitioners {
     override def numPartitions: Int = numberOfParts
 
     override def getPartition(key: Any): Int =
-      (key.asInstanceOf[Long] % numberOfParts.toLong).toInt
+      key.asInstanceOf[Int] % numberOfParts
   }
 
 }

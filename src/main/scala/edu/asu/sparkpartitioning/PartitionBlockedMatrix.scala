@@ -61,7 +61,7 @@ object PartitionBlockedMatrix {
 
     //create a left partitioner
     val leftPartitioner = new LeftPartitioner(numRows, numCols, rowsPerBlock, colsPerBlock)
-    partitioned_blocks = parsed_blocks.partitionBy(leftPartitioner)
+    val partitioned_blocks = parsed_blocks.partitionBy(leftPartitioner).cache()
  
     //write the RDD of Blocks to an object file
     partitioned_blocks.saveAsObjectFile(outputFilePath)

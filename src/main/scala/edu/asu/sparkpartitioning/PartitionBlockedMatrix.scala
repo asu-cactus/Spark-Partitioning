@@ -46,7 +46,7 @@ object PartitionBlockedMatrix {
     }
 
     val conf = new SparkConf()
-      .setAppName("ParseBlockedMatrix")
+      .setAppName("PartitionBlockedMatrix")
       .set("spark.hadoop.validateOutputSpecs", "false")
     val sc = new SparkContext(conf)
 

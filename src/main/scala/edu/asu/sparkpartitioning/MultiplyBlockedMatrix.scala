@@ -24,18 +24,22 @@ object MultiplyBlockedMatrix {
 
   def main(args: Array[String]): Unit = {
 
-    if (args.length != 4) {
+    if (args.length != 8) {
       throw new IllegalArgumentException(
-        "Usage: rowsPerBlock, colsPerBlock, inputLeftFilePath inputRightFilePath"
+        "Usage: rowsPerBlock, colsPerBlock, nLeftRows, nLeftCols, nRightRows, nRightCols, inputLeftFilePath inputRightFilePath"
       )
     }
     val rowsPerBlock = args(0).toInt
     val colsPerBlock = args(1).toInt
-    val inputLeftFilePath = args(2)
-    val inputRightFilePath = args(3)
+    val nLeftRows = args(2).toInt
+    val nLeftCols = args(3).toInt
+    val nRightRows = args(4).toInt
+    val nRightCols = args(5).toInt
+    val inputLeftFilePath = args(6)
+    val inputRightFilePath = args(7)
 
     val conf = new SparkConf()
-      .setAppName("ParseBlockedMatrix")
+      .setAppName("MultiplyBlockedMatrix")
       .set("spark.hadoop.validateOutputSpecs", "false")
     val sc = new SparkContext(conf)
 
@@ -44,10 +48,10 @@ object MultiplyBlockedMatrix {
 
     //run some MLlib linear algebra tests
     val blocked_left_matrix =
-      new BlockMatrix(left_blocks, rowsPerBlock, colsPerBlock).cache()
+      new BlockMatrix(left_blocks, rowsPerBlock, colsPerBlock, nLeftRows, nLeftCols).cache()
 
     val blocked_right_matrix =
-      new BlockMatrix(right_blocks, rowsPerBlock, colsPerBlock).cache()
+      new BlockMatrix(right_blocks, rowsPerBlock, colsPerBlock, nRightRows, nRightCols).cache()
 
     val result = blocked_left_matrix.multiply(blocked_right_matrix)
     println("numRowBlocks:"+(result.numRowBlocks))

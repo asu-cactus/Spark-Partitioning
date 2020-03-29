@@ -59,13 +59,8 @@ object ParseBlockedMatrix {
     //write the RDD of Blocks to an object file
     parsed_blocks.saveAsObjectFile(outputFilePath)
 
-    //run some MLlib linear algebra tests
-    val blocked_matrix =
-      new BlockMatrix(parsed_blocks, rowsPerBlock, colsPerBlock)
-    blocked_matrix.cache()
-    val result = blocked_matrix.multiply(blocked_matrix.transpose)
-    println(result.blocks.count())
-    result.blocks.collect().foreach(println)
+    parsed_blocks.keys.foreach{println}
+
   }
 
 }

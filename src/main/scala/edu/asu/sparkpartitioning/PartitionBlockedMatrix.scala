@@ -1,8 +1,9 @@
 package edu.asu.sparkpartitioning
 
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.{Partitioner, SparkConf, SparkContext}
 import org.apache.spark.rdd.RDD
+import edu.asu.sparkpartitioning.utils.MatrixPartitioners._
 import org.apache.spark.mllib.linalg.{
   DenseMatrix,
   DenseVector,
@@ -20,19 +21,21 @@ import org.apache.spark.mllib.linalg.distributed.{
   RowMatrix
 }
 
-object ParseBlockedMatrix {
+object PartitionBlockedMatrix {
 
   def main(args: Array[String]): Unit = {
 
     if (args.length != 4) {
       throw new IllegalArgumentException(
-        "Usage: rowsPerBlock colsPerBlock inputFilePath outputFilePath"
+        "Usage: numRows numCols rowsPerBlock colsPerBlock inputFilePath outputFilePath"
       )
     }
-    val rowsPerBlock = args(0).toInt
-    val colsPerBlock = args(1).toInt
-    val inputFilePath = args(2)
-    val outputFilePath = args(3)
+    val numRows = args(0).toInt
+    val numCols = args(1).toInt
+    val rowsPerBlock = args(2).toInt
+    val colsPerBlock = args(3).toInt
+    val inputFilePath = args(4)
+    val outputFilePath = args(5)
 
     val conf = new SparkConf()
       .setAppName("ParseBlockedMatrix")
@@ -56,16 +59,13 @@ object ParseBlockedMatrix {
       }
       .cache()
 
+    //create a left partitioner
+    val leftPartitioner = new LeftPartitioner(numRows, numCols, rowsPerBlock, colsPerBlock)
+    partitioned_blocks = parsed_blocks.partitionBy(leftPartitioner)
+ 
     //write the RDD of Blocks to an object file
-    parsed_blocks.saveAsObjectFile(outputFilePath)
+    partitioned_blocks.saveAsObjectFile(outputFilePath)
 
-    //run some MLlib linear algebra tests
-    val blocked_matrix =
-      new BlockMatrix(parsed_blocks, rowsPerBlock, colsPerBlock)
-    blocked_matrix.cache()
-    val result = blocked_matrix.multiply(blocked_matrix.transpose)
-    println(result.blocks.count())
-    result.blocks.collect().foreach(println)
   }
 
 }

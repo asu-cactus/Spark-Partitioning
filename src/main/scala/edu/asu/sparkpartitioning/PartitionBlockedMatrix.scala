@@ -25,9 +25,9 @@ object PartitionBlockedMatrix {
 
   def main(args: Array[String]): Unit = {
 
-    if (args.length != 4) {
+    if (args.length < 6) {
       throw new IllegalArgumentException(
-        "Usage: numRows numCols rowsPerBlock colsPerBlock inputFilePath outputFilePath"
+        "Usage: numRows numCols rowsPerBlock colsPerBlock inputFilePath outputFilePath r(optional: to specify right partitioning. By default it is left partitioning.)"
       )
     }
     val numRows = args(0).toInt
@@ -36,6 +36,14 @@ object PartitionBlockedMatrix {
     val colsPerBlock = args(3).toInt
     val inputFilePath = args(4)
     val outputFilePath = args(5)
+    
+    var left: Boolean = true
+    
+    if (args.length == 7) {
+        if (args(6) == 'r') {
+            left = false
+        }
+    }
 
     val conf = new SparkConf()
       .setAppName("ParseBlockedMatrix")
@@ -59,10 +67,16 @@ object PartitionBlockedMatrix {
       }
       .cache()
 
+    var partitioner = new LeftPartitioner(numRows, numCols, rowsPerBlock, colsPerBlock)
+
     //create a left partitioner
-    val leftPartitioner = new LeftPartitioner(numRows, numCols, rowsPerBlock, colsPerBlock)
-    val partitioned_blocks = parsed_blocks.partitionBy(leftPartitioner).cache()
- 
+    if (!left) {
+        partitioner = new RightPartitioner(numRows, numCols, rowsPerBlock, colsPerBlock)
+    } 
+
+    //partition the data
+    val partitioned_blocks = parsed_blocks.partitionBy(partitioner).cache()
+    
     //write the RDD of Blocks to an object file
     partitioned_blocks.saveAsObjectFile(outputFilePath)
 

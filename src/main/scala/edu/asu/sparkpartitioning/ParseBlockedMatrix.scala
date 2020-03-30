@@ -3,6 +3,7 @@ package edu.asu.sparkpartitioning
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.rdd.RDD
+import breeze.linalg._
 import org.apache.spark.mllib.linalg.{
   DenseMatrix,
   DenseVector,
@@ -39,20 +40,31 @@ object ParseBlockedMatrix {
       .set("spark.hadoop.validateOutputSpecs", "false")
     val sc = new SparkContext(conf)
 
+    var useBreeze: Boolean = true
     val data = sc.textFile(inputFilePath)
 
     //transform the data into an RDD of blocks
     val parsed_blocks = data
       .map { line =>
         val tokens = line.split(' ')
-        (
-          (tokens(0).toInt, tokens(1).toInt),
+        if (useBreeze) {
+
+          //if use breeze, we randomly create a block instead of using the block from the input file
+          //this is fine for performance test
+
+          ((tokens(0).toInt, tokens(1).toInt),
+          breeze.linalg.DenseMatrix.rand[Double](
+            rowsPerBlock,
+            colsPerBlock
+          ))
+        } else {
+          ((tokens(0).toInt, tokens(1).toInt),
           Matrices.dense(
             rowsPerBlock,
             colsPerBlock,
             tokens.tail.tail.map(_.toDouble)
-          )
-        )
+          ))
+        }
       }
       .cache()
 

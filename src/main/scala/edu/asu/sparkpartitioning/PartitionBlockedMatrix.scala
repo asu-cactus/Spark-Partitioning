@@ -4,6 +4,10 @@ import org.apache.log4j.{Level, Logger}
 import org.apache.spark.{Partitioner, SparkConf, SparkContext}
 import org.apache.spark.rdd.RDD
 import edu.asu.sparkpartitioning.utils.MatrixPartitioners._
+import breeze.linalg.{
+  DenseMatrix,
+  Matrix
+}
 import org.apache.spark.mllib.linalg.{
   DenseMatrix,
   DenseVector,
@@ -45,6 +49,9 @@ object PartitionBlockedMatrix {
         }
     }
 
+    var useBreeze: Boolean = true
+
+
     val conf = new SparkConf()
       .setAppName("PartitionBlockedMatrix")
       .set("spark.hadoop.validateOutputSpecs", "false")
@@ -52,18 +59,32 @@ object PartitionBlockedMatrix {
 
     val data = sc.textFile(inputFilePath)
 
+    
     //transform the data into an RDD of blocks
-    val parsed_blocks = data
-      .map { line =>
+    val parsed_blocks = data.map { line =>
         val tokens = line.split(' ')
-        (
-          (tokens(0).toInt, tokens(1).toInt),
-          Matrices.dense(
+        
+        if (useBreeze) {
+
+          //if use breeze, we randomly create a block instead of using the block from the input file
+          //this is fine for performance test
+
+          ((tokens(0).toInt, tokens(1).toInt),
+          breeze.linalg.DenseMatrix.rand[Double](
+            rowsPerBlock,
+            colsPerBlock
+          ))
+        } else {
+
+          // if use spark DenseMatrix, we read from the file
+
+          ((tokens(0).toInt, tokens(1).toInt),
+          org.apache.spark.mllib.linalg.Matrices.dense(
             rowsPerBlock,
             colsPerBlock,
             tokens.tail.tail.map(_.toDouble)
-          )
-        )
+          ))
+         }
       }
       .cache()
 

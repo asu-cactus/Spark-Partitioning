@@ -44,7 +44,7 @@ object PartitionBlockedMatrix {
     var left: Boolean = true
     
     if (args.length == 7) {
-        if (args(6) == 'r') {
+        if (args(6) == "r") {
             left = false
         }
     }

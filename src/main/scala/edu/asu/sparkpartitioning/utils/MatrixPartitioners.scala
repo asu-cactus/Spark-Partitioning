@@ -38,8 +38,8 @@ object MatrixPartitioners {
      */
     override def getPartition(key: Any): Int = {
         key match {
-            case (i: Int, j: Int) => i
-            case (i: Int, j: Int, _: Int) => i
+            case (i: Int, j: Int) => j 
+            case (i: Int, j: Int, _: Int) => j
             case _ =>
                 throw new IllegalArgumentException(s"Unrecognized key: $key.")
         }
@@ -81,8 +81,8 @@ object MatrixPartitioners {
      */
     override def getPartition(key: Any): Int = {
         key match {
-            case (i: Int, j: Int) => j
-            case (i: Int, j: Int, _: Int) => j
+            case (i: Int, j: Int) => i
+            case (i: Int, j: Int, _: Int) => i
             case _ =>
                 throw new IllegalArgumentException(s"Unrecognized key: $key.")
         }

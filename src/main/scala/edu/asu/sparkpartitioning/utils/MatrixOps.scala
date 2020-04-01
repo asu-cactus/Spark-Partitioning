@@ -17,11 +17,11 @@ object MatrixOps {
       numOfParts: Int
     ): RDD[MatrixEntry] = {
 
-      val joinedMatrices = rdd.join(right)
+      val joinedMatrices = rdd.join(right, numOfParts)
 
       joinedMatrices
         .map({ case (_, ((r, lv), (c, rv))) => ((r, c), lv * rv) })
-        .reduceByKey(_ + _)
+        .reduceByKey(_ + _, numOfParts)
         .map({ case ((r, c), sum) => MatrixEntry(r, c, sum) })
     }
   }

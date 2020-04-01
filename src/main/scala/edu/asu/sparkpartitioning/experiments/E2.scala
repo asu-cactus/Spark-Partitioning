@@ -4,6 +4,7 @@ import edu.asu.sparkpartitioning.utils.ExtraOps.timedBlock
 import edu.asu.sparkpartitioning.utils.MatrixOps._
 import org.apache.log4j.Logger
 import org.apache.spark.{Partitioner, SparkContext}
+import org.apache.spark.storage.StorageLevel
 
 /**
  * This class implements the E1 (as mentioned in the document).
@@ -32,10 +33,14 @@ class E2(interNumParts: Int)(implicit sc: SparkContext) {
       val left = sc
         .objectFile[(Int, (Int, Double))](s"$basePath/common/left")
         .partitionBy(matPartitioner)
+        .persist(StorageLevel.DISK_ONLY)
 
       val right = sc
         .objectFile[(Int, (Int, Double))](s"$basePath/common/right")
         .partitionBy(matPartitioner)
+        .persist(StorageLevel.DISK_ONLY)
+
+      val dummyCount = left.join(right).count
 
       left.saveAsObjectFile(s"$basePath/e2/left")
       right.saveAsObjectFile(s"$basePath/e2/right")

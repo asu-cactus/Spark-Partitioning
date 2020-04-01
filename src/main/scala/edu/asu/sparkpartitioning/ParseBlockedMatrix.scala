@@ -1,25 +1,7 @@
 package edu.asu.sparkpartitioning
 
-import org.apache.log4j.{Level, Logger}
 import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.rdd.RDD
-import breeze.linalg._
-import org.apache.spark.mllib.linalg.{
-  DenseMatrix,
-  DenseVector,
-  Matrices,
-  Matrix,
-  Vector,
-  Vectors
-}
-import org.apache.spark.mllib.linalg.distributed.{
-  BlockMatrix,
-  CoordinateMatrix,
-  IndexedRow,
-  IndexedRowMatrix,
-  MatrixEntry,
-  RowMatrix
-}
+import org.apache.spark.mllib.linalg.Matrices
 
 object ParseBlockedMatrix {
 
@@ -52,18 +34,22 @@ object ParseBlockedMatrix {
           //if use breeze, we randomly create a block instead of using the block from the input file
           //this is fine for performance test
 
-          ((tokens(0).toInt, tokens(1).toInt),
-          breeze.linalg.DenseMatrix.rand[Double](
-            rowsPerBlock,
-            colsPerBlock
-          ))
+          (
+            (tokens(0).toInt, tokens(1).toInt),
+            breeze.linalg.DenseMatrix.rand[Double](
+              rowsPerBlock,
+              colsPerBlock
+            )
+          )
         } else {
-          ((tokens(0).toInt, tokens(1).toInt),
-          Matrices.dense(
-            rowsPerBlock,
-            colsPerBlock,
-            tokens.tail.tail.map(_.toDouble)
-          ))
+          (
+            (tokens(0).toInt, tokens(1).toInt),
+            Matrices.dense(
+              rowsPerBlock,
+              colsPerBlock,
+              tokens.tail.tail.map(_.toDouble)
+            )
+          )
         }
       }
       .cache()
@@ -71,7 +57,7 @@ object ParseBlockedMatrix {
     //write the RDD of Blocks to an object file
     parsed_blocks.saveAsObjectFile(outputFilePath)
 
-    parsed_blocks.keys.foreach{println}
+    parsed_blocks.keys.foreach(println)
 
   }
 

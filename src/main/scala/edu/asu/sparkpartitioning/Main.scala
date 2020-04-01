@@ -37,6 +37,7 @@ object Main {
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .set("spark.history.fs.logDirectory", historyDir)
       .set("spark.eventLog.enabled", "true")
+      .set("spark.default.parallelism", numOfParts.toString)
       .set("spark.eventLog.dir", historyDir)
       .registerKryoClasses(
         Array(

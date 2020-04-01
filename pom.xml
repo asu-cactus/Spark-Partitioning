@@ -123,7 +123,51 @@
                     </execution>
                 </executions>
             </plugin>
-       </plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/resources/assembly/assembly.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.antipathy</groupId>
+                <artifactId>mvn-scalafmt_${scala.binary.version}</artifactId>
+                <version>${scala.formatter.version}</version>
+                <configuration>
+                    <configLocation>${project.basedir}/.scalafmt.conf</configLocation>
+                    <skipTestSources>false</skipTestSources>
+                    <skipSources>false</skipSources>
+                    <respectVersion>false</respectVersion>
+                    <sourceDirectories>
+                        <param>${project.basedir}/src/main/scala</param>
+                    </sourceDirectories>
+                    <testSourceDirectories>
+                        <param>${project.basedir}/src/test/scala</param>
+                    </testSourceDirectories>
+                    <validateOnly>false</validateOnly>
+                    <onlyChangedFiles>false</onlyChangedFiles>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>format</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
 </project>

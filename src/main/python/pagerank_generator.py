@@ -32,6 +32,5 @@ for i in range(numPages):
         # link id
         pages.write(str(j))
         pages.write("\n")
-        print("written " + str(numLinks) + " links for page:" + str(i))
 
 pages.close()

@@ -4,8 +4,6 @@ import org.apache.log4j.{Level, Logger}
 import org.apache.spark.{HashPartitioner, SparkConf, SparkContext}
 import org.apache.spark.rdd.RDD
 
-import scala.annotation.tailrec
-
 object Main {
 
   def main(args: Array[String]): Unit = {
@@ -48,12 +46,12 @@ object Main {
 
     val outputRanks = partStatus match {
       case "NO_partition" =>
-        pageRankIteration(linksRDD, ranksRDD, numOfIters, 0)
+        pageRankIteration(linksRDD, ranksRDD, numOfIters)
       case "CO_partitioned" =>
         val hashParts = new HashPartitioner(partitions = 10)
         val partLinks = linksRDD.partitionBy(hashParts)
         val partRanks = ranksRDD.partitionBy(hashParts)
-        pageRankIteration(partLinks, partRanks, numOfIters, 0)
+        pageRankIteration(partLinks, partRanks, numOfIters)
     }
 
     outputRanks
@@ -61,29 +59,37 @@ object Main {
       .saveAsTextFile(s"$basePath/page_rank/output/$partStatus")
   }
 
-  @tailrec
+  /**
+   *  Method to compute ranks based on the incoming links,
+   *  by iterating over the links.
+   *
+   * @param links URLs as key and the list of outgoing links as value.
+   * @param ranks Initial rank of each URL.
+   * @param numOfIters Number of iterations to converge.
+   * @return
+   */
   private def pageRankIteration(
     links: RDD[(String, Iterable[String])],
     ranks: RDD[(String, Double)],
-    numOfIters: Int,
-    acc: Int
-  ): RDD[(String, Double)] =
-    if (acc == numOfIters) {
-      ranks
-    } else {
+    numOfIters: Int
+  ): RDD[(String, Double)] = {
+    var rankUpdates = ranks
+    for (_ <- 0 until numOfIters) {
+
       val contributions = links
-        .join(ranks)
+        .join(rankUpdates)
         .flatMap({
           case (_, (outLinks, rank)) =>
             val numOfOutLinks = outLinks.size
             outLinks.map(x => (x, rank / numOfOutLinks))
         })
 
-      val updatedRanks = contributions
+      rankUpdates = contributions
         .reduceByKey(_ + _)
         .mapValues(_ * 0.85 + 0.15)
-      pageRankIteration(links, updatedRanks, numOfIters, acc + 1)
     }
+    rankUpdates
+  }
 
   /**
    * Method to parse the raw csv/text file of the page rank data.

@@ -1,26 +1,7 @@
 package edu.asu.sparkpartitioning
 
-import org.apache.log4j.{Level, Logger}
-import org.apache.spark.{Partitioner, SparkConf, SparkContext}
-import org.apache.spark.rdd.RDD
 import edu.asu.sparkpartitioning.utils.MatrixPartitioners._
-import breeze.linalg.{DenseMatrix, Matrix}
-import org.apache.spark.mllib.linalg.{
-  DenseMatrix,
-  DenseVector,
-  Matrices,
-  Matrix,
-  Vector,
-  Vectors
-}
-import org.apache.spark.mllib.linalg.distributed.{
-  BlockMatrix,
-  CoordinateMatrix,
-  IndexedRow,
-  IndexedRowMatrix,
-  MatrixEntry,
-  RowMatrix
-}
+import org.apache.spark.{SparkConf, SparkContext}
 
 object PartitionBlockedMatrix {
 
@@ -28,7 +9,9 @@ object PartitionBlockedMatrix {
 
     if (args.length < 6) {
       throw new IllegalArgumentException(
-        "Usage: numRows numCols rowsPerBlock colsPerBlock inputFilePath outputFilePath r(optional: to specify right partitioning. By default it is left partitioning.)"
+        "Usage: numRows numCols rowsPerBlock colsPerBlock inputFilePath " +
+          "outputFilePath r(optional: to specify right partitioning. " +
+          "By default it is left partitioning.)"
       )
     }
     val numRows = args(0).toInt

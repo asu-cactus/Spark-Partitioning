@@ -50,8 +50,7 @@ object Main {
       case "CO_partitioned" =>
         val hashParts = new HashPartitioner(partitions = 10)
         val partLinks = linksRDD.partitionBy(hashParts)
-        val partRanks = ranksRDD.partitionBy(hashParts)
-        pageRankIteration(partLinks, partRanks, numOfIters)
+        pageRankIteration(partLinks, ranksRDD, numOfIters)
     }
 
     outputRanks

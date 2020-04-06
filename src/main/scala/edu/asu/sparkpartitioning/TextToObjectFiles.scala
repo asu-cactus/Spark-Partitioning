@@ -29,6 +29,7 @@ object TextToObjectFiles {
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .set("spark.history.fs.logDirectory", historyDir)
       .set("spark.eventLog.enabled", "true")
+      .set("spark.default.parallelism", "80")
       .set("spark.eventLog.dir", historyDir)
 
     implicit val sc: SparkContext = new SparkContext(conf)

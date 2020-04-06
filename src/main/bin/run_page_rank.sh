@@ -17,12 +17,12 @@ APP_HOME="$(dirname "${SCRIPT_DIRECTORY}")"
 if [ "$1" == "-h" ];
 then
   echo "Usage: $(basename "${0}") {NUM_OF_PAGES} {MAX_LINKS}\
-  {RAW_DATA_OP_NM} {BASE_PATH}"
+  {RAW_DATA_OP_NM} {BASE_PATH} {NUM_OF_ITER}"
   exit 0
 fi
 
 # checking if the number of args to the script are proper
-if [ $# -lt 4 ]
+if [ $# -lt 5 ]
 then
   echo "Missing Operand"
   echo "Run $(basename "${0}") -h for usage"
@@ -34,6 +34,7 @@ echo "NUM_OF_PAGES - ${1}"
 echo "MAX_LINKS - ${2}"
 echo "RAW_DATA_OP_NM - ${3}"
 echo "BASE_PATH - ${4}"
+echo "NUM_OF_ITER - ${5}"
 
 PWD="$(pwd)"
 
@@ -56,7 +57,7 @@ spark-submit \
 "${APP_HOME}"/lib/Spark-Partitioning-0.1-SNAPSHOT.jar \
 hdfs://172.31.19.91:9000"${BASE_PATH}" \
 hdfs://172.31.19.91:9000/spark/applicationHistory \
-"NO_partition"
+"NO_partition" "${5}"
 
 # Run Spark code for the Page Rank algorithm WITH COMMON partitioners
 spark-submit \
@@ -66,7 +67,7 @@ spark-submit \
 "${APP_HOME}"/lib/Spark-Partitioning-0.1-SNAPSHOT.jar \
 hdfs://172.31.19.91:9000"${BASE_PATH}" \
 hdfs://172.31.19.91:9000/spark/applicationHistory \
-"CO_partitioned"
+"CO_partitioned" "${5}"
 
 # If you need to clear the page rank directory from HDFS
 # after the execution is completed, comment the command below

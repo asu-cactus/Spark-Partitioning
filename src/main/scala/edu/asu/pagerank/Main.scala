@@ -8,7 +8,7 @@ object Main {
 
   def main(args: Array[String]): Unit = {
 
-    if (args.length != 3) {
+    if (args.length != 4) {
       throw new IllegalArgumentException(
         "Base path for storing data and spark history log directory are expected." +
           s"\nProvide: ${args.toList}"
@@ -17,6 +17,7 @@ object Main {
     val basePath = args(0)
     val historyDir = args(1)
     val partStatus = args(2)
+    val numOfIters = args(3).toInt
 
     if (!(partStatus == "CO_partitioned" || partStatus == "NO_partition")) {
       throw new IllegalArgumentException(
@@ -42,7 +43,6 @@ object Main {
 
     val linksRDD = parsePageRankData(s"$basePath/page_rank/raw")
     val ranksRDD = linksRDD.map(urlLinks => (urlLinks._1, 1.0))
-    val numOfIters = 10
 
     val outputRanks = partStatus match {
       case "NO_partition" =>
@@ -50,8 +50,7 @@ object Main {
       case "CO_partitioned" =>
         val hashParts = new HashPartitioner(partitions = 10)
         val partLinks = linksRDD.partitionBy(hashParts)
-        val partRanks = ranksRDD.partitionBy(hashParts)
-        pageRankIteration(partLinks, partRanks, numOfIters)
+        pageRankIteration(partLinks, ranksRDD, numOfIters)
     }
 
     outputRanks

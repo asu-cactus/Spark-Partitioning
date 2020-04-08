@@ -39,13 +39,13 @@ echo "NUM_OF_ITER - ${5}"
 PWD="$(pwd)"
 
 # Clear if previous execution data
-hdfs dfs -rm -r "${BASE_PATH}"/page_rank
+hdfs dfs -rm -r "${4}"/page_rank
 # Create random data for page rank algorithm
 python3 "${APP_HOME}"/python/pagerank_generator.py "${1}" "${2}" "${3}"
 # Create the Page Rank raw dir
-hdfs dfs -mkdir -p "${BASE_PATH}"/page_rank/raw/
+hdfs dfs -mkdir -p "${4}"/page_rank/raw/
 # Load the raw text file of page rank data on HDFS
-hdfs dfs -put -f "${PWD}"/"${3}" "${BASE_PATH}"/page_rank/raw/
+hdfs dfs -put -f "${PWD}"/"${3}" "${4}"/page_rank/raw/
 # Delete the raw file from the local file system
 rm "${PWD}"/"${3}"
 
@@ -53,21 +53,23 @@ rm "${PWD}"/"${3}"
 spark-submit \
 --class edu.asu.pagerank.Main \
 --master spark://172.31.19.91:7077 \
+--conf spark.rpc.askTimeout=360s \
 --deploy-mode client \
 "${APP_HOME}"/lib/Spark-Partitioning-0.1-SNAPSHOT.jar \
-hdfs://172.31.19.91:9000"${BASE_PATH}" \
+hdfs://172.31.19.91:9000"${4}" \
 hdfs://172.31.19.91:9000/spark/applicationHistory \
-"NO_partition" "${5}"
+"NO_partitioner" "${5}"
 
 # Run Spark code for the Page Rank algorithm WITH COMMON partitioners
 spark-submit \
 --class edu.asu.pagerank.Main \
 --master spark://172.31.19.91:7077 \
+--conf spark.rpc.askTimeout=360s \
 --deploy-mode client \
 "${APP_HOME}"/lib/Spark-Partitioning-0.1-SNAPSHOT.jar \
-hdfs://172.31.19.91:9000"${BASE_PATH}" \
+hdfs://172.31.19.91:9000"${4}" \
 hdfs://172.31.19.91:9000/spark/applicationHistory \
-"CO_partitioned" "${5}"
+"WITH_partitioner" "${5}"
 
 # If you need to clear the page rank directory from HDFS
 # after the execution is completed, comment the command below

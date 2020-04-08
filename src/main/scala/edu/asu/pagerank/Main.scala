@@ -19,7 +19,7 @@ object Main {
     val partStatus = args(2)
     val numOfIters = args(3).toInt
 
-    if (!(partStatus == "CO_partitioned" || partStatus == "NO_partition")) {
+    if (!(partStatus == "WITH_partitioner" || partStatus == "NO_partitioner")) {
       throw new IllegalArgumentException(
         "Allowed values for 3rd position arguments are - CO_partitioned" +
           s" or NO_partition. Provided: $partStatus"
@@ -45,10 +45,10 @@ object Main {
     val ranksRDD = linksRDD.map(urlLinks => (urlLinks._1, 1.0))
 
     val outputRanks = partStatus match {
-      case "NO_partition" =>
+      case "NO_partitioner" =>
         pageRankIteration(linksRDD, ranksRDD, numOfIters)
-      case "CO_partitioned" =>
-        val hashParts = new HashPartitioner(partitions = 10)
+      case "WITH_partitioner" =>
+        val hashParts = new HashPartitioner(partitions = 80)
         val partLinks = linksRDD.partitionBy(hashParts)
         pageRankIteration(partLinks, ranksRDD, numOfIters)
     }
@@ -77,11 +77,12 @@ object Main {
 
       val contributions = links
         .join(rankUpdates)
-        .flatMap({
-          case (_, (outLinks, rank)) =>
+        .flatMapValues({
+          case (outLinks, currRank) =>
             val numOfOutLinks = outLinks.size
-            outLinks.map(x => (x, rank / numOfOutLinks))
+            outLinks.map(x => (x, currRank / numOfOutLinks))
         })
+        .mapValues(_._2)
 
       rankUpdates = contributions
         .reduceByKey(_ + _)

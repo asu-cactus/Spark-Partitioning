@@ -39,7 +39,7 @@ echo "NUM_OF_ITER - ${5}"
 PWD="$(pwd)"
 
 # Clear if previous execution data
-hdfs dfs -rm -r "${4}"/page_rank
+hdfs dfs -rm -r -skipTrash "${4}"/page_rank
 # Create random data for page rank algorithm
 python3 "${APP_HOME}"/python/pagerank_generator.py "${1}" "${2}" "${3}"
 # Create the Page Rank raw dir

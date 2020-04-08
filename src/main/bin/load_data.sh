@@ -74,8 +74,8 @@ check_HDFS_directories() {
       then
         true
       else
-        hdfs dfs -rm -r "${BASE_PATH}"/raw/left/*
-        hdfs dfs -rm -r "${BASE_PATH}"/raw/right/*
+        hdfs dfs -rm -r -skipTrash "${BASE_PATH}"/raw/left/*
+        hdfs dfs -rm -r -skipTrash "${BASE_PATH}"/raw/right/*
       fi
     fi
   fi
@@ -122,8 +122,8 @@ main() {
   # Forcing the replication to be 1
   hdfs dfs -setrep -w 1 "${BASE_PATH}"
 
-  hdfs dfs -rm -r "${BASE_PATH}"/raw/left
-  hdfs dfs -rm -r "${BASE_PATH}"/raw/right
+  hdfs dfs -rm -r -skipTrash "${BASE_PATH}"/raw/left
+  hdfs dfs -rm -r -skipTrash "${BASE_PATH}"/raw/right
 }
 
 main "${@}"

@@ -25,15 +25,17 @@ pages = open(fileName, "w")
 
 for i in xrange(numPages):
     numLinks = random.randint(0, maxLinks)
-    links = random.sample(range(0, numPages-1), numLinks) 
-    for j in links:
+    #links = random.sample(range(0, numPages-1), numLinks) 
+    for j in xrange(numLinks):
         #page id
         pages.write(str(i))
         pages.write(" ")
         #link id
         pages.write(str(j))
         pages.write("\n")
-        print("written "+str(numLinks) +" links for page:"+ str(i))
+    
+if i % 100000 == 0:
+    print("written "+str(i)+" pages")
 
 
 pages.close()

@@ -17,7 +17,7 @@ find_script_home() {
 
 input_checks() {
   # help for usage of the script
-  if [ "$1" == "-h" ]; 
+  if [ "$1" == "-h" ];
   then
     echo "Usage: $(basename "${0}") {r1} {c1} {r2} {c2} {BASE_PATH}"
     exit 0
@@ -37,10 +37,10 @@ input_checks() {
   echo "r2 - ${3}"
   echo "c2 - ${4}"
   echo "Base Path - ${5}"
-  
+
   # checking if c1 == r2 which is required for matrix multiplication
   if [ "${2}" != "${3}" ]
-  then 
+  then
     echo "Error: c1 and r2 should be equal for matrix multiplication"
     echo "Run $(basename "${0}") -h for usage"
     exit 0
@@ -48,9 +48,9 @@ input_checks() {
 }
 
 check_HDFS_directories() {
-  
+
   BASE_PATH=$1
-  
+
   # check if raw folder exists
   if [[ $(hdfs dfs -test -d "${BASE_PATH}"/raw) -eq 0 ]]
   then
@@ -113,7 +113,7 @@ main() {
 
   # running the spark command to convert txt files to objectfiles
   spark-submit \
-  --class edu.asu.sparkpartitioning.TextToObjectFiles \
+  --class edu.asu.parquetfiles.TextToParquetFiles \
   --master spark://172.31.19.91:7077 \
   --deploy-mode client \
   "${APP_HOME}"/lib/Spark-Partitioning-0.1-SNAPSHOT.jar \

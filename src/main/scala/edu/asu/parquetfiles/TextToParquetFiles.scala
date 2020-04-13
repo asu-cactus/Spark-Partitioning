@@ -7,6 +7,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object TextToParquetFiles {
+
   def main(args: Array[String]): Unit = {
 
     if (args.length != 2) {
@@ -37,12 +38,12 @@ object TextToParquetFiles {
       SparkSession.builder().appName("ParquetFiles").config(conf).getOrCreate()
 
     val left: DataFrame = readMatrix(s"$basePath/raw/left")
-    val right: DataFrame = readMatrix( s"$basePath/raw/right")
+    val right: DataFrame = readMatrix(s"$basePath/raw/right")
 
     left.show()
     right.show()
 
-    left.write.parquet(s"$basePath/parquet/left.parquet")
-    right.write.parquet( s"$basePath/parquet/right.parquet")
+    left.write.parquet(s"$basePath/common/left.parquet")
+    right.write.parquet(s"$basePath/common/right.parquet")
   }
 }

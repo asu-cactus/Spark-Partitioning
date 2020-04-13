@@ -3,7 +3,6 @@ package edu.asu.parquetfiles.utils
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-
 object Parser {
 
   /**
@@ -18,8 +17,9 @@ object Parser {
 
     import ss.implicits._
     val textRDD = ss.sparkContext.textFile(path)
-    val mappedRDD = textRDD.map(x=>x.split(",")).map {
-      case Array(row, col, value) => MatrixEntry(row.toInt, col.toInt, value.toDouble)
+    val mappedRDD = textRDD.map(x => x.split(",")).map {
+      case Array(row, col, value) =>
+        MatrixEntry(row.toInt, col.toInt, value.toDouble)
     }
     mappedRDD.toDF()
 

@@ -1,0 +1,53 @@
+package edu.asu.tpch.tables
+
+import org.apache.spark.sql.{Encoders, SparkSession}
+import org.apache.spark.sql.functions.{col, to_date}
+import org.apache.spark.sql.types.StructType
+
+private[tpch] case class Lineitem(
+  L_ORDERKEY: Int,
+  L_PARTKEY: Int,
+  L_SUPPKEY: Int,
+  L_LINENUMBER: Int,
+  L_QUANTITY: Double,
+  L_EXTENDEDPRICE: Double,
+  L_DISCOUNT: Double,
+  L_TAX: Double,
+  L_RETURNFLAG: String,
+  L_LINESTATUS: String,
+  L_SHIPDATE: String,
+  L_COMMITDATE: String,
+  L_RECEIPTDATE: String,
+  L_SHIPINSTRUCT: String,
+  L_SHIPMODE: String,
+  L_COMMENT: String
+)
+
+object Lineitem extends TableOps {
+  override protected def getSchema: StructType =
+    Encoders.product[Lineitem].schema
+  override protected def getRawDirName: String = "lineitem.tbl"
+  override protected def getParquetDirName: String = "lineitem"
+
+  override def rawToParquet(
+    basePath: String
+  )(implicit spark: SparkSession): Unit = {
+    val rawDf = getRawTableDf(basePath, spark)
+    rawDf
+      .withColumn(
+        "L_SHIPDATE",
+        to_date(col("L_SHIPDATE"), dateFormat)
+      )
+      .withColumn(
+        "L_COMMITDATE",
+        to_date(col("L_COMMITDATE"), dateFormat)
+      )
+      .withColumn(
+        "L_RECEIPTDATE",
+        to_date(col("L_RECEIPTDATE"), dateFormat)
+      )
+      .repartition(numPartitions = 80)
+      .write
+      .parquet(s"$basePath/parquet/$getParquetDirName")
+  }
+}

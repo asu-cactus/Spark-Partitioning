@@ -21,6 +21,9 @@ Allowed values for `${EXPERIMENT}` are `e1`, `e2` or `e3`.
 
 2. Convert the raw files into parquet data by running the command `./bin/convert_tpch.sh ${BASE_PATH}`.
 
+3. To execute TPC-H query use command `run_tpch_query.sh ${BASE_PATH} ${QUERY_NUM}`. If you want to run all the 
+queries use `${QUERY_NUM}=all`.
+
 **Code style notes**
 1. Python indentation and tabs = 4 spaces. (We are using Python 3)
 2. Bash script indentation and tabs = 2 spaces.

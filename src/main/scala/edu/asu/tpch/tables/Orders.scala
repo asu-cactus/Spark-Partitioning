@@ -1,5 +1,6 @@
 package edu.asu.tpch.tables
 
+import edu.asu.tpch.tables.AllColNames.O_ORDERDATE
 import org.apache.spark.sql.{Encoders, SparkSession}
 import org.apache.spark.sql.functions.{col, to_date}
 import org.apache.spark.sql.types.StructType
@@ -26,8 +27,8 @@ private[tpch] object Orders extends TableOps {
     val rawDf = getRawTableDf(basePath, spark)
     rawDf
       .withColumn(
-        "O_ORDERDATE",
-        to_date(col("O_ORDERDATE"), dateFormat)
+        O_ORDERDATE,
+        to_date(col(O_ORDERDATE), dateFormat)
       )
       .repartition(numPartitions = 80)
       .write

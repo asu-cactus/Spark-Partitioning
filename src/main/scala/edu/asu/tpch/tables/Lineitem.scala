@@ -1,5 +1,6 @@
 package edu.asu.tpch.tables
 
+import edu.asu.tpch.tables.AllColNames._
 import org.apache.spark.sql.{Encoders, SparkSession}
 import org.apache.spark.sql.functions.{col, to_date}
 import org.apache.spark.sql.types.StructType
@@ -35,16 +36,16 @@ object Lineitem extends TableOps {
     val rawDf = getRawTableDf(basePath, spark)
     rawDf
       .withColumn(
-        "L_SHIPDATE",
-        to_date(col("L_SHIPDATE"), dateFormat)
+        L_SHIPDATE,
+        to_date(col(L_SHIPDATE), dateFormat)
       )
       .withColumn(
-        "L_COMMITDATE",
-        to_date(col("L_COMMITDATE"), dateFormat)
+        L_COMMITDATE,
+        to_date(col(L_COMMITDATE), dateFormat)
       )
       .withColumn(
-        "L_RECEIPTDATE",
-        to_date(col("L_RECEIPTDATE"), dateFormat)
+        L_RECEIPTDATE,
+        to_date(col(L_RECEIPTDATE), dateFormat)
       )
       .repartition(numPartitions = 80)
       .write

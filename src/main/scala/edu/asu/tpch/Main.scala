@@ -59,35 +59,35 @@ object Main {
       "supplier" -> Supplier.readTable(basePath)
     )
 
-    val queryMap = Map(
-      1 -> Q1,
-      2 -> Q2,
-      3 -> Q3,
-      4 -> Q4,
-      5 -> Q5,
-      6 -> Q6,
-      7 -> Q7,
-      8 -> Q8,
-      9 -> Q9,
-      10 -> Q10,
-      11 -> Q11,
-      12 -> Q12,
-      13 -> Q13,
-      14 -> Q14,
-      15 -> Q15,
-      16 -> Q16,
-      17 -> Q17,
-      18 -> Q18,
-      19 -> Q19,
-      20 -> Q20,
-      21 -> Q21,
-      22 -> Q22
+    val queryList = Seq(
+      (1, Q1),
+      (2, Q2),
+      (3, Q3),
+      (4, Q4),
+      (5, Q5),
+      (6, Q6),
+      (7, Q7),
+      (8, Q8),
+      (9, Q9),
+      (10, Q10),
+      (11, Q11),
+      (12, Q12),
+      (13, Q13),
+      (14, Q14),
+      (15, Q15),
+      (16, Q16),
+      (17, Q17),
+      (18, Q18),
+      (19, Q19),
+      (20, Q20),
+      (21, Q21),
+      (22, Q22)
     )
 
     val queriesToRun = if (queryNum == 0) {
-      queryMap.values.toSeq
+      queryList.map(_._2)
     } else {
-      Seq(queryMap(queryNum))
+      Seq(queryList.find(x => x._1 == queryNum).get._2)
     }
 
     queriesToRun.foreach { q =>

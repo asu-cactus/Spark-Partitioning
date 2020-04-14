@@ -1,6 +1,5 @@
-package edu.asu.parquetfiles.utils
+package edu.asu.sqlpartitioning.utils
 
-import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object Parser {
@@ -11,7 +10,7 @@ object Parser {
    *
    * @param path HDFS path to the text file
    * @param ss [[SparkSession]] the entry point to the app
-   * @return [[RDD]] of [[MatrixEntry]]
+   * @return [[DataFrame]] of [[MatrixEntry]]
    */
   def readMatrix(path: String)(implicit ss: SparkSession): DataFrame = {
 
@@ -21,7 +20,7 @@ object Parser {
       case Array(row, col, value) =>
         MatrixEntry(row.toInt, col.toInt, value.toDouble)
     }
-    mappedRDD.toDF()
+    mappedRDD.toDF("rowID", "columnID", "value")
 
   }
 

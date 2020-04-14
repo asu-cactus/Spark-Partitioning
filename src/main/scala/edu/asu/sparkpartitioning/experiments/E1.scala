@@ -45,7 +45,8 @@ class E1(interNumParts: Int)(implicit sc: SparkContext) {
     )
 
     val (_, timeToMultiply: Long) = timedBlock {
-      val leftMat = sc.objectFile[(Int, (Int, Double))](s"$basePath/e1/left")
+      val leftMat =
+        sc.objectFile[(Int, (Int, Double))](s"$basePath/e1/left")
       val rightMat =
         sc.objectFile[(Int, (Int, Double))](s"$basePath/e1/right")
 

@@ -29,12 +29,10 @@ object Lineitem extends TableOps {
     Encoders.product[Lineitem].schema
   override protected def getRawDirName: String = "lineitem.tbl"
   override protected def getParquetDirName: String = "lineitem"
-
   override def rawToParquet(
     basePath: String
   )(implicit spark: SparkSession): Unit = {
     val rawDf = getRawTableDf(basePath, spark)
-    rawDf
       .withColumn(
         L_SHIPDATE,
         to_date(col(L_SHIPDATE), dateFormat)
@@ -47,8 +45,8 @@ object Lineitem extends TableOps {
         L_RECEIPTDATE,
         to_date(col(L_RECEIPTDATE), dateFormat)
       )
-      .repartition(numPartitions = 80)
-      .write
+
+    parquetParts(rawDf).write
       .parquet(s"$basePath/parquet/$getParquetDirName")
   }
 }

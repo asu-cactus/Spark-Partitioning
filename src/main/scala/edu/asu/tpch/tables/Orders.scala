@@ -25,13 +25,12 @@ private[tpch] object Orders extends TableOps {
     basePath: String
   )(implicit spark: SparkSession): Unit = {
     val rawDf = getRawTableDf(basePath, spark)
-    rawDf
       .withColumn(
         O_ORDERDATE,
         to_date(col(O_ORDERDATE), dateFormat)
       )
-      .repartition(numPartitions = 80)
-      .write
+
+    parquetParts(rawDf).write
       .parquet(s"$basePath/parquet/$getParquetDirName")
   }
 }

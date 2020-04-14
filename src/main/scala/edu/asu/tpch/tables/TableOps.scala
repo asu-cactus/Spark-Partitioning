@@ -44,10 +44,17 @@ private[tpch] trait TableOps {
    * @param spark [[SparkSession]] application entry point
    */
   def rawToParquet(basePath: String)(implicit spark: SparkSession): Unit =
-    getRawTableDf(basePath, spark)
-      .repartition(numPartitions = 80)
-      .write
+    parquetParts(getRawTableDf(basePath, spark)).write
       .parquet(s"$basePath/parquet/$getParquetDirName")
+
+  /**
+   * Method to apply some partitioning before writing
+   * the data to disk in Parquet format.
+   *
+   * @param df [[DataFrame]] of the data
+   * @return
+   */
+  protected def parquetParts(df: DataFrame): DataFrame = df.repartition(80)
 
   /**
    * Method to read the TPC-H tables which are stored on

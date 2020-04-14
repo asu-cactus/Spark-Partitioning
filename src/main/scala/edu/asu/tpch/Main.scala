@@ -96,7 +96,7 @@ object Main {
       val queryMinutes = (queryTotalSeconds / 60).toLong
       val querySeconds = (queryTotalSeconds % 60).toInt
       log.info(
-        s"Time take by query ${q.getClass.getCanonicalName.split("\\.").last} " +
+        s"Time take by query ${q.getClass.getCanonicalName.split("\\.").last.replace("$", "")} " +
           s"is $queryMinutes minutes $querySeconds seconds"
       )
     }

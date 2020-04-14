@@ -1,4 +1,4 @@
-package edu.asu.parquetfiles.utils
+package edu.asu.sqlpartitioning.utils
 
 object ExtraOps {
 

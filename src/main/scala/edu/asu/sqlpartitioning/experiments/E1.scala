@@ -1,9 +1,9 @@
-package edu.asu.parquetfiles.experiments
+package edu.asu.sqlpartitioning.experiments
 
-import edu.asu.sparkpartitioning.utils.ExtraOps.timedBlock
-import edu.asu.sparkpartitioning.utils.MatrixOps._
+import edu.asu.sqlpartitioning.utils.ExtraOps.timedBlock
+import edu.asu.sqlpartitioning.utils.MatrixOps._
 import org.apache.log4j.Logger
-import org.apache.spark.SparkContext
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
 /**
  * This class implements the E1 (as mentioned in the document).
@@ -15,9 +15,9 @@ import org.apache.spark.SparkContext
  * Method [[execute()]] will do all the above mentioned steps.
  * And also calculate time required from step 2 to step 4.
  *
- * @param sc [[SparkContext]] of the application.
+ * @param ss [[SparkSession]] of the application.
  */
-class E1(interNumParts: Int)(implicit sc: SparkContext) {
+class E1(interNumParts: Int)(implicit ss: SparkSession) {
 
   /**
    * Method to execute the required steps.
@@ -28,13 +28,11 @@ class E1(interNumParts: Int)(implicit sc: SparkContext) {
   def execute(basePath: String)(implicit log: Logger): Unit = {
 
     val (_, timeToDisk: Long) = timedBlock {
-      val left =
-        sc.objectFile[(Int, (Int, Double))](s"$basePath/common/left")
-      val right =
-        sc.objectFile[(Int, (Int, Double))](s"$basePath/common/right")
+      val leftDF = ss.read.parquet(s"$basePath/common/left.parquet")
+      val rightDF = ss.read.parquet(s"$basePath/common/right.parquet")
 
-      left.saveAsObjectFile(s"$basePath/e1/left")
-      right.saveAsObjectFile(s"$basePath/e1/right")
+      leftDF.write.parquet(s"$basePath/e1/left.parquet")
+      rightDF.write.parquet(s"$basePath/e1/right.parquet")
     }
 
     val dataTotalSeconds = timeToDisk / math.pow(10, 3)
@@ -45,12 +43,13 @@ class E1(interNumParts: Int)(implicit sc: SparkContext) {
     )
 
     val (_, timeToMultiply: Long) = timedBlock {
-      val leftMat = sc.objectFile[(Int, (Int, Double))](s"$basePath/e1/left")
-      val rightMat = sc.objectFile[(Int, (Int, Double))](s"$basePath/e1/right")
+      val leftDF = ss.read.parquet(s"$basePath/e1/left.parquet")
+      val rightDF = ss.read.parquet(s"$basePath/e1/right.parquet")
 
-      val res = leftMat.multiply(rightMat, interNumParts)
+      val res: DataFrame = leftDF.multiply(rightDF, interNumParts)
+//      res.show()
 
-      res.saveAsObjectFile(s"$basePath/e1/multiplication_op")
+      res.write.parquet(s"$basePath/e1/matrix_op.parquet")
     }
 
     val multiplyTotalSeconds = timeToMultiply / math.pow(10, 3)

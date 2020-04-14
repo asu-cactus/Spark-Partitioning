@@ -1,12 +1,9 @@
-package edu.asu.parquetfiles
+package edu.asu.sqlpartitioning
 
-import edu.asu.parquetfiles.experiments.{E1, E2, E3}
-import edu.asu.parquetfiles.utils.MatrixOps.PairedOps
-import edu.asu.parquetfiles.utils.MatrixPartitioners.IndexedPartitioner
-import edu.asu.parquetfiles.utils.Parser.MatrixEntry
+import edu.asu.sqlpartitioning.experiments.{E1, E2, E3}
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.rdd.RDD
-import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.{SparkConf}
 
 object Main {
 
@@ -33,21 +30,21 @@ object Main {
     System.setProperty("spark.hadoop.dfs.replication", "1")
 
     val conf = new SparkConf()
-      .setAppName("matrix_multiplication")
+      .setAppName("SQL_multiplication")
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .set("spark.history.fs.logDirectory", historyDir)
       .set("spark.eventLog.enabled", "true")
-      .set("spark.default.parallelism", numOfParts.toString)
+      .set("spark.default.parallelism", "80")
       .set("spark.eventLog.dir", historyDir)
+      .set("spark.sql.crossJoin.enabled", "true")
 
-    implicit val sc: SparkContext = new SparkContext(conf)
-
-    val matPartitioner = new IndexedPartitioner(numOfParts)
+    implicit val ss =
+      SparkSession.builder().appName("ParquetFiles").config(conf).getOrCreate()
 
     experiment match {
       case "e1" => new E1(numOfParts).execute(basePath)
-      case "e2" => new E2(numOfParts).execute(basePath, matPartitioner)
-      case "e3" => new E3(numOfParts).execute(basePath, matPartitioner)
+      case "e2" => new E2(numOfParts).execute(basePath)
+      case "e3" => new E3(numOfParts).execute(basePath)
 
     }
   }

@@ -1,9 +1,8 @@
-package edu.asu.parquetfiles
+package edu.asu.sqlpartitioning
 
-import edu.asu.parquetfiles.utils.Parser.{readMatrix, MatrixEntry}
+import edu.asu.sqlpartitioning.utils.Parser.{readMatrix}
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkConf
-import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object TextToParquetFiles {
@@ -27,7 +26,7 @@ object TextToParquetFiles {
     System.setProperty("spark.hadoop.dfs.replication", "1")
 
     val conf = new SparkConf()
-      .setAppName("parsing_text_to_object_files")
+      .setAppName("parsing_text_to_parquet_files")
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .set("spark.history.fs.logDirectory", historyDir)
       .set("spark.eventLog.enabled", "true")
@@ -40,8 +39,8 @@ object TextToParquetFiles {
     val left: DataFrame = readMatrix(s"$basePath/raw/left")
     val right: DataFrame = readMatrix(s"$basePath/raw/right")
 
-    left.show()
-    right.show()
+//    left.show()
+//    right.show()
 
     left.write.parquet(s"$basePath/common/left.parquet")
     right.write.parquet(s"$basePath/common/right.parquet")

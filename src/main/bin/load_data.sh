@@ -19,12 +19,12 @@ input_checks() {
   # help for usage of the script
   if [ "$1" == "-h" ]; 
   then
-    echo "Usage: $(basename "${0}") {r1} {c1} {r2} {c2} {BASE_PATH}"
+    echo "Usage: $(basename "${0}") {r1} {c1} {r2} {c2} {WORK_FLOW = (SQL, SPARK)} {BASE_PATH}"
     exit 0
   fi
 
   # checking if the number of args to the script are proper
-  if [ $# -lt 5 ]
+  if [ $# -lt 6 ]
   then
     echo "Missing Operand"
     echo "Run $(basename "${0}") -h for usage"
@@ -36,7 +36,8 @@ input_checks() {
   echo "c1 - ${2}"
   echo "r2 - ${3}"
   echo "c2 - ${4}"
-  echo "Base Path - ${5}"
+  echo "Work Flow - ${5}"
+  echo "Base Path - ${6}"
   
   # checking if c1 == r2 which is required for matrix multiplication
   if [ "${2}" != "${3}" ]
@@ -94,7 +95,8 @@ check_HDFS_directories() {
 main() {
   find_script_home
   input_checks "${@}"
-  BASE_PATH=$5
+  WORK_FLOW=$5
+  BASE_PATH=$6
   PWD=$(pwd)
 
   #check if all the directories required are present in the HDFS
@@ -111,15 +113,37 @@ main() {
   rm "${PWD}"/left_matrix.txt
   rm "${PWD}"/right_matrix.txt
 
-  # running the spark command to convert txt files to objectfiles
-  spark-submit \
-  --class edu.asu.sparkpartitioning.TextToObjectFiles \
-  --master spark://172.31.19.91:7077 \
-  --deploy-mode client \
-  "${APP_HOME}"/lib/Spark-Partitioning-0.1-SNAPSHOT.jar \
-  hdfs://172.31.19.91:9000"${BASE_PATH}" \
-  hdfs://172.31.19.91:9000/spark/applicationHistory
+  # running the workflow according to input to convert to either objectfiles or parquet files
+  case $WORK_FLOW in
 
+  "SPARK")
+    echo "SPARK"
+    spark-submit \
+    --class edu.asu.sparkpartitioning.TextToObjectFiles \
+    --master spark://172.31.19.91:7077 \
+    --deploy-mode client \
+    "${APP_HOME}"/lib/Spark-Partitioning-0.1-SNAPSHOT.jar \
+    hdfs://172.31.19.91:9000"${BASE_PATH}" \
+    hdfs://172.31.19.91:9000/spark/applicationHistory
+    ;;
+
+  "SQL")
+    echo "SQL"
+#    spark-submit \
+#    --class edu.asu.sqlpartitioning.TextToParquetFiles \
+#    --master local \
+#    target/Spark-Partitioning-0.1-SNAPSHOT.jar \
+#    /home/sujaygd/parquet /home/sujaygd/history/
+
+    spark-submit \
+    --class edu.asu.sqlpartitioning.TextToParquetFiles \
+    --master spark://172.31.19.91:7077 \
+    --deploy-mode client \
+    "${APP_HOME}"/lib/Spark-Partitioning-0.1-SNAPSHOT.jar \
+    hdfs://172.31.19.91:9000"${BASE_PATH}" \
+    hdfs://172.31.19.91:9000/spark/applicationHistory
+    ;;
+  esac
   # Forcing the replication to be 1
   hdfs dfs -setrep -w 1 "${BASE_PATH}"
 

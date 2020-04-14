@@ -1,10 +1,12 @@
-package edu.asu.parquetfiles.experiments
+package edu.asu.sqlpartitioning.experiments
 
-import edu.asu.sparkpartitioning.utils.ExtraOps.timedBlock
-import edu.asu.sparkpartitioning.utils.MatrixOps._
+import edu.asu.sqlpartitioning.utils.ExtraOps.timedBlock
 import org.apache.log4j.Logger
+import edu.asu.sqlpartitioning.utils.MatrixOps._
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions._
 import org.apache.spark.storage.StorageLevel
-import org.apache.spark.{Partitioner, SparkContext}
+
 
 /**
  * This class implements the E1 (as mentioned in the document).
@@ -17,7 +19,7 @@ import org.apache.spark.{Partitioner, SparkContext}
  * Method [[execute()]] will do all the above mentioned steps.
  * And also calculate time required from step 3 to step 4.
  */
-class E2(interNumParts: Int)(implicit sc: SparkContext) {
+class E2(interNumParts: Int)(implicit ss: SparkSession) {
 
   /**
    * Method to execute the required steps.
@@ -25,25 +27,25 @@ class E2(interNumParts: Int)(implicit sc: SparkContext) {
    * @param basePath Base path on the secondary storage
    * @param log      Logger instance to display result on the console.
    */
-  def execute(basePath: String, matPartitioner: Partitioner)(
+  def execute(basePath: String)(
     implicit log: Logger
   ): Unit = {
 
     val (_, timeToDisk: Long) = timedBlock {
-      val left = sc
-        .objectFile[(Int, (Int, Double))](s"$basePath/common/left")
-        .partitionBy(matPartitioner)
+      val leftDF = ss.read
+        .parquet(s"$basePath/common/left.parquet")
+        .repartition(interNumParts, col("columnID"))
         .persist(StorageLevel.DISK_ONLY)
 
-      val right = sc
-        .objectFile[(Int, (Int, Double))](s"$basePath/common/right")
-        .partitionBy(matPartitioner)
+      val rightDF = ss.read
+        .parquet(s"$basePath/common/right.parquet")
+        .repartition(interNumParts, col("rowID"))
         .persist(StorageLevel.DISK_ONLY)
 
-      val dummyCount = left.join(right).count
+      val dummyCount = leftDF.join(rightDF).count
 
-      left.saveAsObjectFile(s"$basePath/e2/left")
-      right.saveAsObjectFile(s"$basePath/e2/right")
+      leftDF.write.parquet(s"$basePath/e2/left.parquet")
+      rightDF.write.parquet(s"$basePath/e2/right.parquet")
     }
 
     val dataTotalSeconds = timeToDisk / math.pow(10, 3)
@@ -55,14 +57,13 @@ class E2(interNumParts: Int)(implicit sc: SparkContext) {
     )
 
     val (_, timeToMultiply: Long) = timedBlock {
-      val leftMat =
-        sc.objectFile[(Int, (Int, Double))](s"$basePath/e2/left")
-      val rightMat =
-        sc.objectFile[(Int, (Int, Double))](s"$basePath/e2/right")
+      val leftDF = ss.read.parquet(s"$basePath/e2/left.parquet")
+      val rightDF = ss.read.parquet(s"$basePath/e2/right.parquet")
 
-      val res = leftMat.multiply(rightMat, interNumParts)
+      val res = leftDF.multiply(rightDF, interNumParts)
+//      res.show()
 
-      res.saveAsObjectFile(s"$basePath/e2/multiplication_op")
+      res.write.parquet(s"$basePath/e2/matrix_op.parquet")
     }
 
     val multiplyTotalSeconds = timeToMultiply / math.pow(10, 3)

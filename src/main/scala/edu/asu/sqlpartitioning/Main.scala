@@ -36,7 +36,6 @@ object Main {
       .set("spark.eventLog.enabled", "true")
       .set("spark.default.parallelism", "80")
       .set("spark.eventLog.dir", historyDir)
-      .set("spark.sql.crossJoin.enabled", "true")
 
     implicit val ss =
       SparkSession.builder().appName("ParquetFiles").config(conf).getOrCreate()

@@ -7,7 +7,6 @@ import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
 import org.apache.spark.storage.StorageLevel
 
-
 /**
  * This class implements the E1 (as mentioned in the document).
  * Step 1: Partition the matrices
@@ -42,7 +41,10 @@ class E2(interNumParts: Int)(implicit ss: SparkSession) {
         .repartition(interNumParts, col("rowID"))
         .persist(StorageLevel.DISK_ONLY)
 
-      val dummyCount = leftDF.join(rightDF).count
+      val dummyCount = leftDF
+        .as("LEFT")
+        .join(rightDF.as("RIGHT"), col("LEFT.columnID") === col("RIGHT.rowID"))
+        .count
 
       leftDF.write.parquet(s"$basePath/e2/left.parquet")
       rightDF.write.parquet(s"$basePath/e2/right.parquet")

@@ -1,6 +1,6 @@
 package edu.asu.tpch.tables
 
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.{DataFrame, DataFrameWriter, Row, SparkSession}
 import org.apache.spark.sql.types.StructType
 
 private[tpch] trait TableOps {
@@ -29,12 +29,22 @@ private[tpch] trait TableOps {
     basePath: String,
     spark: SparkSession
   ): DataFrame =
-    spark.read
-      .format("csv")
-      .option("header", "false")
-      .option("delimiter", "|")
-      .schema(getSchema)
-      .load(s"$basePath/raw_data/$getRawDirName")
+    transformRawDf(
+      spark.read
+        .format("csv")
+        .option("header", "false")
+        .option("delimiter", "|")
+        .schema(getSchema)
+        .load(s"$basePath/raw_data/$getRawDirName")
+    )
+
+  /**
+   * Method to process raw data read from text files.
+   *
+   * @param df [[DataFrame]] generated from text files.
+   * @return
+   */
+  protected def transformRawDf(df: DataFrame): DataFrame = df
 
   /**
    *  Method to read raw text files and write the data
@@ -44,8 +54,34 @@ private[tpch] trait TableOps {
    * @param spark [[SparkSession]] application entry point
    */
   def rawToParquet(basePath: String)(implicit spark: SparkSession): Unit =
-    parquetParts(getRawTableDf(basePath, spark)).write
+    getRawTableDf(basePath, spark).write
       .parquet(s"$basePath/parquet/$getParquetDirName")
+
+  /**
+   *  Method to read raw text files and write the data
+   *  to Parquet format.
+   *
+   * @param basePath Experimentation directory
+   * @param spark [[SparkSession]] application entry point
+   */
+  def rawToParquetWithParts(
+    basePath: String
+  )(implicit spark: SparkSession): Unit =
+    parquetParts(getRawTableDf(basePath, spark)).write
+      .parquet(s"$basePath/parquet_parts/$getParquetDirName")
+
+  /**
+   *  Method to read raw text files and write the data
+   *  to Parquet format.
+   *
+   * @param basePath Experimentation directory
+   * @param spark [[SparkSession]] application entry point
+   */
+  def rawToParquetWithBuckets(
+    basePath: String
+  )(implicit spark: SparkSession): Unit =
+    parquetBuckets(getRawTableDf(basePath, spark).write)
+      .parquet(s"$basePath/parquet_buckets/$getParquetDirName")
 
   /**
    * Method to apply some partitioning before writing
@@ -57,6 +93,18 @@ private[tpch] trait TableOps {
   protected def parquetParts(df: DataFrame): DataFrame = df.repartition(80)
 
   /**
+   * Method to apply some bucketing before writing
+   * the data to disk in Parquet format.
+   *
+   * @param dfWriter [[DataFrameWriter]] of the data
+   * @return
+   */
+  protected def parquetBuckets(
+    dfWriter: DataFrameWriter[Row]
+  ): DataFrameWriter[Row] =
+    dfWriter
+
+  /**
    * Method to read the TPC-H tables which are stored on
    * disk in Parquet format.
    *
@@ -66,5 +114,31 @@ private[tpch] trait TableOps {
    */
   def readTable(basePath: String)(implicit spark: SparkSession): DataFrame =
     spark.read.parquet(s"$basePath/parquet/$getParquetDirName")
+
+  /**
+   * Method to read the TPC-H tables which are stored on
+   * disk in Parquet format after repartitioning.
+   *
+   * @param basePath Experimentation directory
+   * @param spark [[SparkSession]] application entry point
+   * @return [[DataFrame]] of the table
+   */
+  def readTableFromParts(
+    basePath: String
+  )(implicit spark: SparkSession): DataFrame =
+    spark.read.parquet(s"$basePath/parquet_parts/$getParquetDirName")
+
+  /**
+   * Method to read the TPC-H tables which are stored on
+   * disk in Parquet format after Bucketing.
+   *
+   * @param basePath Experimentation directory
+   * @param spark [[SparkSession]] application entry point
+   * @return [[DataFrame]] of the table
+   */
+  def readTableFromBuckets(
+    basePath: String
+  )(implicit spark: SparkSession): DataFrame =
+    spark.read.parquet(s"$basePath/parquet_buckets/$getParquetDirName")
 
 }

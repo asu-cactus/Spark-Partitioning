@@ -51,6 +51,24 @@ object RawToParquet {
     Partsupp.rawToParquet(basePath)
     Region.rawToParquet(basePath)
     Supplier.rawToParquet(basePath)
+
+    Customer.rawToParquetWithParts(basePath)
+    Lineitem.rawToParquetWithParts(basePath)
+    Nation.rawToParquetWithParts(basePath)
+    Orders.rawToParquetWithParts(basePath)
+    Part.rawToParquetWithParts(basePath)
+    Partsupp.rawToParquetWithParts(basePath)
+    Region.rawToParquetWithParts(basePath)
+    Supplier.rawToParquetWithParts(basePath)
+
+    Customer.rawToParquetWithBuckets(basePath)
+    Lineitem.rawToParquetWithBuckets(basePath)
+    Nation.rawToParquetWithBuckets(basePath)
+    Orders.rawToParquetWithBuckets(basePath)
+    Part.rawToParquetWithBuckets(basePath)
+    Partsupp.rawToParquetWithBuckets(basePath)
+    Region.rawToParquetWithBuckets(basePath)
+    Supplier.rawToParquetWithBuckets(basePath)
   }
 
 }

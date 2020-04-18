@@ -9,9 +9,10 @@ import org.apache.spark.sql.SparkSession
 object Main {
 
   def main(args: Array[String]): Unit = {
-    if (args.length != 3) {
+    if (args.length != 4) {
       throw new IllegalArgumentException(
-        "Base path for storing data, spark history log directory, query " +
+        "Base path for storing data, spark history log directory, query and " +
+          "data partition type to read" +
           "to execute are expected" +
           s"\nProvide: ${args.toList}"
       )
@@ -19,13 +20,13 @@ object Main {
     val basePath = args(0)
     val historyDir = args(1)
     val queryToRun = args(2)
+    val partType = args(3)
 
-    val queryNum =
-      if (queryToRun == "all") {
-        0
-      } else {
-        queryToRun.toInt
-      }
+    val queryNum = queryToRun match {
+      case "all"      => 0
+      case "custom"   => 23
+      case in: String => in.toInt
+    }
 
     Logger.getLogger("org.spark_project").setLevel(Level.WARN)
     Logger.getLogger("org.apache").setLevel(Level.WARN)
@@ -48,46 +49,74 @@ object Main {
       .config(conf)
       .getOrCreate()
 
-    val tableDfMap = Map(
-      "customer" -> Customer.readTable(basePath),
-      "lineitem" -> Lineitem.readTable(basePath),
-      "nation" -> Nation.readTable(basePath),
-      "orders" -> Orders.readTable(basePath),
-      "part" -> Part.readTable(basePath),
-      "partsupp" -> Partsupp.readTable(basePath),
-      "region" -> Region.readTable(basePath),
-      "supplier" -> Supplier.readTable(basePath)
-    )
+    val tableDfMap = partType match {
+      case "none" =>
+        Map(
+          "customer" -> Customer.readTable(basePath),
+          "lineitem" -> Lineitem.readTable(basePath),
+          "nation" -> Nation.readTable(basePath),
+          "orders" -> Orders.readTable(basePath),
+          "part" -> Part.readTable(basePath),
+          "partsupp" -> Partsupp.readTable(basePath),
+          "region" -> Region.readTable(basePath),
+          "supplier" -> Supplier.readTable(basePath)
+        )
+
+      case "parts" =>
+        Map(
+          "customer" -> Customer.readTableFromParts(basePath),
+          "lineitem" -> Lineitem.readTableFromParts(basePath),
+          "nation" -> Nation.readTableFromParts(basePath),
+          "orders" -> Orders.readTableFromParts(basePath),
+          "part" -> Part.readTableFromParts(basePath),
+          "partsupp" -> Partsupp.readTableFromParts(basePath),
+          "region" -> Region.readTableFromParts(basePath),
+          "supplier" -> Supplier.readTableFromParts(basePath)
+        )
+
+      case "buckets" =>
+        Map(
+          "customer" -> Customer.readTableFromBuckets(basePath),
+          "lineitem" -> Lineitem.readTableFromBuckets(basePath),
+          "nation" -> Nation.readTableFromBuckets(basePath),
+          "orders" -> Orders.readTableFromBuckets(basePath),
+          "part" -> Part.readTableFromBuckets(basePath),
+          "partsupp" -> Partsupp.readTableFromBuckets(basePath),
+          "region" -> Region.readTableFromBuckets(basePath),
+          "supplier" -> Supplier.readTableFromBuckets(basePath)
+        )
+    }
 
     val queryList = Seq(
-      (1, Q1),
-      (2, Q2),
-      (3, Q3),
-      (4, Q4),
-      (5, Q5),
-      (6, Q6),
-      (7, Q7),
-      (8, Q8),
-      (9, Q9),
-      (10, Q10),
-      (11, Q11),
-      (12, Q12),
-      (13, Q13),
-      (14, Q14),
-      (15, Q15),
-      (16, Q16),
-      (17, Q17),
-      (18, Q18),
-      (19, Q19),
-      (20, Q20),
-      (21, Q21),
-      (22, Q22)
+      Q1,
+      Q2,
+      Q3,
+      Q4,
+      Q5,
+      Q6,
+      Q7,
+      Q8,
+      Q9,
+      Q10,
+      Q11,
+      Q12,
+      Q13,
+      Q14,
+      Q15,
+      Q16,
+      Q17,
+      Q18,
+      Q19,
+      Q20,
+      Q21,
+      Q22,
+      Custom
     )
 
     val queriesToRun = if (queryNum == 0) {
-      queryList.map(_._2)
+      queryList
     } else {
-      Seq(queryList.find(x => x._1 == queryNum).get._2)
+      Seq(queryList(queryNum - 1))
     }
 
     queriesToRun.foreach { q =>
@@ -95,10 +124,24 @@ object Main {
       val queryTotalSeconds = time / math.pow(10, 3)
       val queryMinutes = (queryTotalSeconds / 60).toLong
       val querySeconds = (queryTotalSeconds % 60).toInt
-      log.info(
-        s"Time take by query ${q.getClass.getCanonicalName.split("\\.").last.replace("$", "")} " +
-          s"is $queryMinutes minutes $querySeconds seconds"
-      )
+
+      partType match {
+        case "none" =>
+          log.info(
+            s"Time take by query ${q.getClass.getCanonicalName.split("\\.").last.replace("$", "")} " +
+              s"is $queryMinutes minutes $querySeconds seconds"
+          )
+        case "parts" =>
+          log.info(
+            s"Time take by query ${q.getClass.getCanonicalName.split("\\.").last.replace("$", "")} " +
+              s"is $queryMinutes minutes $querySeconds seconds"
+          )
+        case "buckets" =>
+          log.info(
+            s"Time take by query ${q.getClass.getCanonicalName.split("\\.").last.replace("$", "")} " +
+              s"is $queryMinutes minutes $querySeconds seconds"
+          )
+      }
     }
 
   }

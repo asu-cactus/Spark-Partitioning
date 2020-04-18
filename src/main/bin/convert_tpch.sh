@@ -35,6 +35,8 @@ PWD="$(pwd)"
 
 # Clear if previous execution data
 hdfs dfs -rm -r -skipTrash "${1}"/parquet
+hdfs dfs -rm -r -skipTrash "${1}"/parquet_parts
+hdfs dfs -rm -r -skipTrash "${1}"/parquet_buckets
 
 # Spark application to read raw TPC-H data
 # and convert it to Parquet format.

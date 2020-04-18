@@ -16,7 +16,7 @@ APP_HOME="$(dirname "${SCRIPT_DIRECTORY}")"
 # help for usage of the script
 if [ "${1}" == "-h" ];
 then
-  echo "Usage: $(basename "${0}") {BASE_PATH} {QUERY_NUM}"
+  echo "Usage: $(basename "${0}") {BASE_PATH} {QUERY_NUM} {PART_TYPE}"
   exit 0
 fi
 
@@ -31,6 +31,7 @@ fi
 echo "Your Input :- "
 echo "BASE_PATH - ${1}"
 echo "QUERY_NUM - ${2}"
+echo "PART_TYPE - ${3}"
 
 PWD="$(pwd)"
 
@@ -47,4 +48,4 @@ spark-submit \
 "${APP_HOME}"/lib/Spark-Partitioning-0.1-SNAPSHOT.jar \
 hdfs://172.31.19.91:9000"${1}" \
 hdfs://172.31.19.91:9000/spark/applicationHistory \
-"${2}"
+"${2}" "${3}"

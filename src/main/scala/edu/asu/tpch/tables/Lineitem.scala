@@ -1,7 +1,7 @@
 package edu.asu.tpch.tables
 
 import edu.asu.tpch.tables.AllColNames._
-import org.apache.spark.sql.{Encoders, SparkSession}
+import org.apache.spark.sql.{DataFrame, DataFrameWriter, Encoders, Row}
 import org.apache.spark.sql.functions.{col, to_date}
 import org.apache.spark.sql.types.StructType
 
@@ -29,11 +29,8 @@ object Lineitem extends TableOps {
     Encoders.product[Lineitem].schema
   override protected def getRawDirName: String = "lineitem.tbl"
   override protected def getParquetDirName: String = "lineitem"
-  override def rawToParquet(
-    basePath: String
-  )(implicit spark: SparkSession): Unit = {
-    val rawDf = getRawTableDf(basePath, spark)
-      .withColumn(
+  override protected def transformRawDf(df: DataFrame): DataFrame =
+    df.withColumn(
         L_SHIPDATE,
         to_date(col(L_SHIPDATE), dateFormat)
       )
@@ -46,7 +43,14 @@ object Lineitem extends TableOps {
         to_date(col(L_RECEIPTDATE), dateFormat)
       )
 
-    parquetParts(rawDf).write
-      .parquet(s"$basePath/parquet/$getParquetDirName")
-  }
+  override protected def parquetParts(df: DataFrame): DataFrame =
+    df.repartition(80, col(L_ORDERKEY))
+
+  override protected def parquetBuckets(
+    dfWriter: DataFrameWriter[Row]
+  ): DataFrameWriter[Row] =
+    dfWriter
+      .bucketBy(80, L_ORDERKEY)
+      .sortBy(L_ORDERKEY)
+
 }

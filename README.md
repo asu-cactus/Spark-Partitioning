@@ -15,14 +15,15 @@ Allowed values for `${EXPERIMENT}` are `e1`, `e2` or `e3`.
 4. To execute naive implementation of `PageRank` (normal code and with co-partitioning both) on Spark, execute command
   `nohup ./bin/run_page_rank.sh ${NUM_OF_PAGES} ${MAX_LINKS} ${RAW_DATA_OP_NM} ${BASE_PATH} > rank.logs &`.
 
+
 #### Steps to execute TPC-H benchmarks.
 
 1. Load raw TPC-H data, generated from `dbgen` to a location `${BASE_PATH}/raw_data/`.
 
 2. Convert the raw files into parquet data by running the command `./bin/convert_tpch.sh ${BASE_PATH}`.
 
-3. To execute TPC-H query use command `run_tpch_query.sh ${BASE_PATH} ${QUERY_NUM}`. If you want to run all the 
-queries use `${QUERY_NUM}=all`.
+3. To execute TPC-H query use command `run_tpch_query.sh ${BASE_PATH} ${QUERY_NUM} ${PARTITION_TYPE} `. If you want to run all the 
+queries use `${QUERY_NUM}=all`. Allowed values for `${PARTITION_TYPE}` are `none`, `parts` and `buckets`.
 
 **Code style notes**
 1. Python indentation and tabs = 4 spaces. (We are using Python 3)

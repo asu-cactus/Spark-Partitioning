@@ -1,6 +1,6 @@
 package edu.asu.tpch.tables
 
-import org.apache.spark.sql.{DataFrame, DataFrameWriter, Row, SparkSession}
+import org.apache.spark.sql._
 import org.apache.spark.sql.types.StructType
 
 private[tpch] trait TableOps {
@@ -81,7 +81,8 @@ private[tpch] trait TableOps {
     basePath: String
   )(implicit spark: SparkSession): Unit =
     parquetBuckets(getRawTableDf(basePath, spark).write)
-      .parquet(s"$basePath/parquet_buckets/$getParquetDirName")
+      .mode(SaveMode.Overwrite)
+      .saveAsTable(s"$getParquetDirName")
 
   /**
    * Method to apply some partitioning before writing
@@ -139,6 +140,8 @@ private[tpch] trait TableOps {
   def readTableFromBuckets(
     basePath: String
   )(implicit spark: SparkSession): DataFrame =
-    spark.read.parquet(s"$basePath/parquet_buckets/$getParquetDirName")
+    spark.read
+      .option("path", "/home/ubuntu/spark/warehouse")
+      .table(s"$getParquetDirName")
 
 }

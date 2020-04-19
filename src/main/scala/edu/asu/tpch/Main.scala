@@ -134,12 +134,12 @@ object Main {
         case "parts" =>
           log.info(
             s"Time take by query ${q.getClass.getCanonicalName.split("\\.").last.replace("$", "")} " +
-              s"is $queryMinutes minutes $querySeconds seconds"
+              s"after partition is $queryMinutes minutes $querySeconds seconds"
           )
         case "buckets" =>
           log.info(
             s"Time take by query ${q.getClass.getCanonicalName.split("\\.").last.replace("$", "")} " +
-              s"is $queryMinutes minutes $querySeconds seconds"
+              s"after bucketing is $queryMinutes minutes $querySeconds seconds"
           )
       }
     }

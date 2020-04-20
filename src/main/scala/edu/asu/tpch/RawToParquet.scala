@@ -61,14 +61,15 @@ object RawToParquet {
     Region.rawToParquetWithParts(basePath)
     Supplier.rawToParquetWithParts(basePath)
 
-    Customer.rawToParquetWithBuckets(basePath)
-    Lineitem.rawToParquetWithBuckets(basePath)
-    Nation.rawToParquetWithBuckets(basePath)
-    Orders.rawToParquetWithBuckets(basePath)
-    Part.rawToParquetWithBuckets(basePath)
-    Partsupp.rawToParquetWithBuckets(basePath)
-    Region.rawToParquetWithBuckets(basePath)
-    Supplier.rawToParquetWithBuckets(basePath)
+    // TODO: Fix the issue, it takes too long to write files
+//    Customer.rawToParquetWithBuckets(basePath)
+//    Lineitem.rawToParquetWithBuckets(basePath)
+//    Nation.rawToParquetWithBuckets(basePath)
+//    Orders.rawToParquetWithBuckets(basePath)
+//    Part.rawToParquetWithBuckets(basePath)
+//    Partsupp.rawToParquetWithBuckets(basePath)
+//    Region.rawToParquetWithBuckets(basePath)
+//    Supplier.rawToParquetWithBuckets(basePath)
   }
 
 }

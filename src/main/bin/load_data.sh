@@ -129,11 +129,6 @@ main() {
 
   "SQL")
     echo "SQL"
-#    spark-submit \
-#    --class edu.asu.sqlpartitioning.TextToParquetFiles \
-#    --master local \
-#    target/Spark-Partitioning-0.1-SNAPSHOT.jar \
-#    /home/sujaygd/parquet /home/sujaygd/history/
 
     spark-submit \
     --class edu.asu.sqlpartitioning.TextToParquetFiles \
@@ -144,6 +139,7 @@ main() {
     hdfs://172.31.19.91:9000/spark/applicationHistory
     ;;
   esac
+
   # Forcing the replication to be 1
   hdfs dfs -setrep -w 1 "${BASE_PATH}"
 

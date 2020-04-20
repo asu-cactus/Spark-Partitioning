@@ -63,7 +63,6 @@ class E2(interNumParts: Int)(implicit ss: SparkSession) {
       val rightDF = ss.read.parquet(s"$basePath/e2/right.parquet")
 
       val res = leftDF.multiply(rightDF, interNumParts)
-//      res.show()
 
       res.write.parquet(s"$basePath/e2/matrix_op.parquet")
     }

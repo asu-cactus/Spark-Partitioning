@@ -1,7 +1,7 @@
 #!/bin/bash
 input_checks() {
 	if [ "$1" == "-h" ]; then
-			echo "Usage: $(basename "${0}") {WORK_FLOW = (SQL, SPARK)} {BASE_PATH} {EXPERIMENT NUMBER - can be e1, e2 or e3} {NUMBER OF PARTITIONS}"
+			echo "Usage: $(basename "${0}") {WORK_FLOW = (SQL, SPARK, BUCKET)} {BASE_PATH} {EXPERIMENT NUMBER - can be e1, e2 or e3} {NUMBER OF PARTITIONS}"
 			exit 0
 	fi
 
@@ -63,6 +63,19 @@ main() {
 
     spark-submit \
     --class edu.asu.sqlpartitioning.Main \
+    --master spark://172.31.19.91:7077 \
+    --deploy-mode client \
+    "${APP_HOME}"/lib/Spark-Partitioning-0.1-SNAPSHOT.jar \
+    hdfs://172.31.19.91:9000"${BASE_PATH}" hdfs://172.31.19.91:9000/spark/applicationHistory \
+    "${PARTITIONS}" "${EXPERIMENT}"
+  ;;
+
+  "BUCKET")
+    echo "Running SQL with bucketing experiment"
+    # spark command for running an experiment
+
+    spark-submit \
+    --class edu.asu.sqlbucketing.Main \
     --master spark://172.31.19.91:7077 \
     --deploy-mode client \
     "${APP_HOME}"/lib/Spark-Partitioning-0.1-SNAPSHOT.jar \

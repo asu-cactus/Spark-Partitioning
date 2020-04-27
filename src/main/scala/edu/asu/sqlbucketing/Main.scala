@@ -1,6 +1,6 @@
-package edu.asu.sqlpartitioning
+package edu.asu.sqlbucketing
 
-import edu.asu.sqlpartitioning.experiments.{E1, E2, E3}
+import edu.asu.sqlbucketing.experiments._
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.SparkConf
@@ -40,16 +40,19 @@ object Main {
     implicit val spark: SparkSession =
       SparkSession
         .builder()
-        .appName("ParquetFiles")
+        .appName("Table_Buckets")
         .config(conf)
         .getOrCreate()
 
     experiment match {
       case "e1" => new E1(numOfParts).execute(basePath)
       case "e2" => new E2(numOfParts).execute(basePath)
-      case "e3" => new E3(numOfParts).execute(basePath)
-
     }
+
+    spark.sql("DROP TABLE left")
+    spark.sql("DROP TABLE right")
+    spark.sql("DROP TABLE matrix_op")
+
   }
 
 }

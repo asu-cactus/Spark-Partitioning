@@ -15,9 +15,9 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
  * Method [[execute()]] will do all the above mentioned steps.
  * And also calculate time required from step 2 to step 4.
  *
- * @param ss [[SparkSession]] of the application.
+ * @param spark [[SparkSession]] of the application.
  */
-class E1(interNumParts: Int)(implicit ss: SparkSession) {
+class E1(interNumParts: Int)(implicit spark: SparkSession) {
 
   /**
    * Method to execute the required steps.
@@ -28,8 +28,8 @@ class E1(interNumParts: Int)(implicit ss: SparkSession) {
   def execute(basePath: String)(implicit log: Logger): Unit = {
 
     val (_, timeToDisk: Long) = timedBlock {
-      val leftDF = ss.read.parquet(s"$basePath/common/left.parquet")
-      val rightDF = ss.read.parquet(s"$basePath/common/right.parquet")
+      val leftDF = spark.read.parquet(s"$basePath/common/left.parquet")
+      val rightDF = spark.read.parquet(s"$basePath/common/right.parquet")
 
       leftDF.write.parquet(s"$basePath/e1/left.parquet")
       rightDF.write.parquet(s"$basePath/e1/right.parquet")
@@ -43,8 +43,8 @@ class E1(interNumParts: Int)(implicit ss: SparkSession) {
     )
 
     val (_, timeToMultiply: Long) = timedBlock {
-      val leftDF = ss.read.parquet(s"$basePath/e1/left.parquet")
-      val rightDF = ss.read.parquet(s"$basePath/e1/right.parquet")
+      val leftDF = spark.read.parquet(s"$basePath/e1/left.parquet")
+      val rightDF = spark.read.parquet(s"$basePath/e1/right.parquet")
 
       val res: DataFrame = leftDF.multiply(rightDF, interNumParts)
 

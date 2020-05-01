@@ -10,7 +10,7 @@
 
     <properties>
         <project.build.name>${project.artifactId}-${project.version}</project.build.name>
-        <apache.spark.version>2.2.3</apache.spark.version>
+        <apache.spark.version>2.4.5</apache.spark.version>
         <maven.shaded.plugin.version>3.0.0</maven.shaded.plugin.version>
         <scala.version>2.11.11</scala.version>
         <scala.binary.version>2.11</scala.binary.version>

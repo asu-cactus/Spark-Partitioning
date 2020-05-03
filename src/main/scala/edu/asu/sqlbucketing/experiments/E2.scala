@@ -28,8 +28,8 @@ class E2(interNumParts: Int)(implicit spark: SparkSession) {
   ): Unit = {
 
     val (_, timeToDisk: Long) = timedBlock {
-      val leftDF = spark.read.parquet(s"$basePath/common/left.parquet")
-      val rightDF = spark.read.parquet(s"$basePath/common/right.parquet")
+      val leftDF = spark.read.parquet(s"$basePath/common/left")
+      val rightDF = spark.read.parquet(s"$basePath/common/right")
 
       leftDF.write.bucketBy(interNumParts, "columnID").saveAsTable("left")
       rightDF.write.bucketBy(interNumParts, "rowID").saveAsTable("right")

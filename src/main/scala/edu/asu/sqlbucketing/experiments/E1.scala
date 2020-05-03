@@ -28,8 +28,8 @@ class E1(interNumParts: Int)(implicit spark: SparkSession) {
   def execute(basePath: String)(implicit log: Logger): Unit = {
 
     val (_, timeToDisk: Long) = timedBlock {
-      val leftDF = spark.read.parquet(s"$basePath/common/left.parquet")
-      val rightDF = spark.read.parquet(s"$basePath/common/right.parquet")
+      val leftDF = spark.read.parquet(s"$basePath/common/left")
+      val rightDF = spark.read.parquet(s"$basePath/common/right")
 
       leftDF.write.saveAsTable("left")
       rightDF.write.saveAsTable("right")

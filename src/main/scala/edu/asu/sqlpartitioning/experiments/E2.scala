@@ -32,12 +32,12 @@ class E2(interNumParts: Int)(implicit spark: SparkSession) {
 
     val (_, timeToDisk: Long) = timedBlock {
       val leftDF = spark.read
-        .parquet(s"$basePath/common/left.parquet")
+        .parquet(s"$basePath/common/left")
         .repartition(interNumParts, col("columnID"))
         .persist(StorageLevel.DISK_ONLY)
 
       val rightDF = spark.read
-        .parquet(s"$basePath/common/right.parquet")
+        .parquet(s"$basePath/common/right")
         .repartition(interNumParts, col("rowID"))
         .persist(StorageLevel.DISK_ONLY)
 
@@ -46,8 +46,8 @@ class E2(interNumParts: Int)(implicit spark: SparkSession) {
         .join(rightDF.as("RIGHT"), col("LEFT.columnID") === col("RIGHT.rowID"))
         .count
 
-      leftDF.write.parquet(s"$basePath/e2/left.parquet")
-      rightDF.write.parquet(s"$basePath/e2/right.parquet")
+      leftDF.write.parquet(s"$basePath/e2/left")
+      rightDF.write.parquet(s"$basePath/e2/right")
     }
 
     val dataTotalSeconds = timeToDisk / math.pow(10, 3)
@@ -59,12 +59,12 @@ class E2(interNumParts: Int)(implicit spark: SparkSession) {
     )
 
     val (_, timeToMultiply: Long) = timedBlock {
-      val leftDF = spark.read.parquet(s"$basePath/e2/left.parquet")
-      val rightDF = spark.read.parquet(s"$basePath/e2/right.parquet")
+      val leftDF = spark.read.parquet(s"$basePath/e2/left")
+      val rightDF = spark.read.parquet(s"$basePath/e2/right")
 
       val res = leftDF.multiply(rightDF, interNumParts)
 
-      res.write.parquet(s"$basePath/e2/matrix_op.parquet")
+      res.write.parquet(s"$basePath/e2/matrix_op")
     }
 
     val multiplyTotalSeconds = timeToMultiply / math.pow(10, 3)

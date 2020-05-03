@@ -28,11 +28,11 @@ class E1(interNumParts: Int)(implicit spark: SparkSession) {
   def execute(basePath: String)(implicit log: Logger): Unit = {
 
     val (_, timeToDisk: Long) = timedBlock {
-      val leftDF = spark.read.parquet(s"$basePath/common/left.parquet")
-      val rightDF = spark.read.parquet(s"$basePath/common/right.parquet")
+      val leftDF = spark.read.parquet(s"$basePath/common/left")
+      val rightDF = spark.read.parquet(s"$basePath/common/right")
 
-      leftDF.write.parquet(s"$basePath/e1/left.parquet")
-      rightDF.write.parquet(s"$basePath/e1/right.parquet")
+      leftDF.write.parquet(s"$basePath/e1/left")
+      rightDF.write.parquet(s"$basePath/e1/right")
     }
 
     val dataTotalSeconds = timeToDisk / math.pow(10, 3)
@@ -43,12 +43,12 @@ class E1(interNumParts: Int)(implicit spark: SparkSession) {
     )
 
     val (_, timeToMultiply: Long) = timedBlock {
-      val leftDF = spark.read.parquet(s"$basePath/e1/left.parquet")
-      val rightDF = spark.read.parquet(s"$basePath/e1/right.parquet")
+      val leftDF = spark.read.parquet(s"$basePath/e1/left")
+      val rightDF = spark.read.parquet(s"$basePath/e1/right")
 
       val res: DataFrame = leftDF.multiply(rightDF, interNumParts)
 
-      res.write.parquet(s"$basePath/e1/matrix_op.parquet")
+      res.write.parquet(s"$basePath/e1/matrix_op")
     }
 
     val multiplyTotalSeconds = timeToMultiply / math.pow(10, 3)

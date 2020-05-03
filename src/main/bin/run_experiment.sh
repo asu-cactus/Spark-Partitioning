@@ -1,7 +1,7 @@
 #!/bin/bash
 input_checks() {
 	if [ "$1" == "-h" ]; then
-			echo "Usage: $(basename "${0}") {WORK_FLOW = (SQL, SPARK, BUCKET)} {BASE_PATH} {EXPERIMENT NUMBER - can be e1, e2 or e3} {NUMBER OF PARTITIONS}"
+			echo "Usage: $(basename "${0}") {WORK_FLOW = (SQL, RDD, BUCKET)} {BASE_PATH} {EXPERIMENT NUMBER - can be e1, e2 or e3} {NUMBER OF PARTITIONS}"
 			exit 0
 	fi
 
@@ -45,8 +45,8 @@ main() {
 
   case $WORK_FLOW in
 
-  "SPARK")
-    echo "Running Spark experiment"
+  "RDD")
+    echo "Running RDD experiment"
     # spark command for running an experiment
     spark-submit \
     --class edu.asu.sparkpartitioning.Main \

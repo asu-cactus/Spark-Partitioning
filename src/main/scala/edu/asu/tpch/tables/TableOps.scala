@@ -80,9 +80,8 @@ private[tpch] trait TableOps {
   def rawToParquetWithBuckets(
     basePath: String
   )(implicit spark: SparkSession): Unit =
-    parquetBuckets(getRawTableDf(basePath, spark).write)
-      .mode(SaveMode.Overwrite)
-      .saveAsTable(s"$getParquetDirName")
+    parquetParts(getRawTableDf(basePath, spark))
+      .createOrReplaceGlobalTempView(s"$getParquetDirName")
 
   /**
    * Method to apply some partitioning before writing
@@ -113,7 +112,9 @@ private[tpch] trait TableOps {
    * @param spark [[SparkSession]] application entry point
    * @return [[DataFrame]] of the table
    */
-  def readTable(basePath: String)(implicit spark: SparkSession): DataFrame =
+  def readTableParquet(
+    basePath: String
+  )(implicit spark: SparkSession): DataFrame =
     spark.read.parquet(s"$basePath/parquet/$getParquetDirName")
 
   /**
@@ -140,8 +141,6 @@ private[tpch] trait TableOps {
   def readTableFromBuckets(
     basePath: String
   )(implicit spark: SparkSession): DataFrame =
-    spark.read
-      .option("path", "/home/ubuntu/spark/warehouse")
-      .table(s"$getParquetDirName")
+    spark.table(s"$getParquetDirName")
 
 }

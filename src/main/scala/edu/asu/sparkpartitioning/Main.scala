@@ -33,7 +33,7 @@ object Main {
     System.setProperty("spark.hadoop.dfs.replication", "1")
 
     val conf = new SparkConf()
-      .setAppName("matrix_multiplication")
+      .setAppName(s"rdd_multiplication_$experiment")
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .set("spark.history.fs.logDirectory", historyDir)
       .set("spark.eventLog.enabled", "true")

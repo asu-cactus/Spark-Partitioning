@@ -52,14 +52,14 @@ object Main {
     val tableDfMap = partType match {
       case "none" =>
         Map(
-          "customer" -> Customer.readTable(basePath),
-          "lineitem" -> Lineitem.readTable(basePath),
-          "nation" -> Nation.readTable(basePath),
-          "orders" -> Orders.readTable(basePath),
-          "part" -> Part.readTable(basePath),
-          "partsupp" -> Partsupp.readTable(basePath),
-          "region" -> Region.readTable(basePath),
-          "supplier" -> Supplier.readTable(basePath)
+          "customer" -> Customer.readTableParquet(basePath),
+          "lineitem" -> Lineitem.readTableParquet(basePath),
+          "nation" -> Nation.readTableParquet(basePath),
+          "orders" -> Orders.readTableParquet(basePath),
+          "part" -> Part.readTableParquet(basePath),
+          "partsupp" -> Partsupp.readTableParquet(basePath),
+          "region" -> Region.readTableParquet(basePath),
+          "supplier" -> Supplier.readTableParquet(basePath)
         )
 
       case "parts" =>

@@ -18,10 +18,6 @@ object TextToObjectFiles {
     val basePath = args(0)
     val historyDir = args(1)
 
-    Logger.getLogger("org.spark_project").setLevel(Level.WARN)
-    Logger.getLogger("org.apache").setLevel(Level.WARN)
-    Logger.getLogger("akka").setLevel(Level.WARN)
-    Logger.getLogger("com").setLevel(Level.WARN)
     System.setProperty("spark.hadoop.dfs.replication", "1")
 
     val conf = new SparkConf()

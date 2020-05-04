@@ -1,7 +1,7 @@
 package edu.asu.sqlpartitioning
 
 import edu.asu.sqlpartitioning.experiments.{E1, E2, E3}
-import org.apache.log4j.{Level, Logger}
+import org.apache.log4j.Logger
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.SparkConf
 
@@ -20,11 +20,6 @@ object Main {
     val historyDir = args(1)
     val numOfParts = args(2).toInt
     val experiment = args(3)
-
-    Logger.getLogger("org.spark_project").setLevel(Level.WARN)
-    Logger.getLogger("org.apache").setLevel(Level.WARN)
-    Logger.getLogger("akka").setLevel(Level.WARN)
-    Logger.getLogger("com").setLevel(Level.WARN)
 
     implicit val log: Logger = Logger.getLogger("MatrixMultiplication")
     System.setProperty("spark.hadoop.dfs.replication", "1")

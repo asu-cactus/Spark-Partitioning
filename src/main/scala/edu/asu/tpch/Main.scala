@@ -2,7 +2,7 @@ package edu.asu.tpch
 
 import edu.asu.tpch.queries._
 import edu.asu.tpch.tables._
-import org.apache.log4j.{Level, Logger}
+import org.apache.log4j.Logger
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 
@@ -27,11 +27,6 @@ object Main {
       case "custom"   => 23
       case in: String => in.toInt
     }
-
-    Logger.getLogger("org.spark_project").setLevel(Level.WARN)
-    Logger.getLogger("org.apache").setLevel(Level.WARN)
-    Logger.getLogger("akka").setLevel(Level.WARN)
-    Logger.getLogger("com").setLevel(Level.WARN)
 
     implicit val log: Logger = Logger.getLogger("TPC_H_Spark")
     System.setProperty("spark.hadoop.dfs.replication", "1")

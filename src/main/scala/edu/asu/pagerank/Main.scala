@@ -1,6 +1,5 @@
 package edu.asu.pagerank
 
-import org.apache.log4j.{Level, Logger}
 import org.apache.spark.{HashPartitioner, SparkConf, SparkContext}
 import org.apache.spark.rdd.RDD
 
@@ -26,10 +25,6 @@ object Main {
       )
     }
 
-    Logger.getLogger("org.spark_project").setLevel(Level.WARN)
-    Logger.getLogger("org.apache").setLevel(Level.WARN)
-    Logger.getLogger("akka").setLevel(Level.WARN)
-    Logger.getLogger("com").setLevel(Level.WARN)
     System.setProperty("spark.hadoop.dfs.replication", "1")
 
     val conf = new SparkConf()

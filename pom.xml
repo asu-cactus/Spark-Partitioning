@@ -9,6 +9,7 @@
     <version>0.1-SNAPSHOT</version>
 
     <properties>
+        <encoding>UTF-8</encoding>
         <project.build.name>${project.artifactId}-${project.version}</project.build.name>
         <apache.spark.version>2.4.5</apache.spark.version>
         <maven.shaded.plugin.version>3.0.0</maven.shaded.plugin.version>

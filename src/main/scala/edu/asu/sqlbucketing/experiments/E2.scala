@@ -1,19 +1,16 @@
-package edu.asu.sqlpartitioning.experiments
+package edu.asu.sqlbucketing.experiments
 
 import edu.asu.sqlpartitioning.utils.ExtraOps.timedBlock
-import org.apache.log4j.Logger
 import edu.asu.sqlpartitioning.utils.MatrixOps._
+import org.apache.log4j.Logger
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions._
-import org.apache.spark.storage.StorageLevel
 
 /**
  * This class implements the E1 (as mentioned in the document).
- * Step 1: Partition the matrices
- * Step 2: Write the random matrices to secondary storage
- * Step 3: Read the matrices
- * Step 4: Perform multiplication operation
- * Step 5: Write the result to secondary storage
+ * Step 1: Write the matrices to tables with bucketing
+ * Step 2: Read the matrices
+ * Step 3: Perform multiplication operation
+ * Step 4: Write the result to secondary storage
  *
  * Method [[execute()]] will do all the above mentioned steps.
  * And also calculate time required from step 3 to step 4.
@@ -31,23 +28,11 @@ class E2(interNumParts: Int)(implicit spark: SparkSession) {
   ): Unit = {
 
     val (_, timeToDisk: Long) = timedBlock {
-      val leftDF = spark.read
-        .parquet(s"$basePath/common/left")
-        .repartition(interNumParts, col("columnID"))
-        .persist(StorageLevel.DISK_ONLY)
+      val leftDF = spark.read.parquet(s"$basePath/common/left")
+      val rightDF = spark.read.parquet(s"$basePath/common/right")
 
-      val rightDF = spark.read
-        .parquet(s"$basePath/common/right")
-        .repartition(interNumParts, col("rowID"))
-        .persist(StorageLevel.DISK_ONLY)
-
-      val dummyCount = leftDF
-        .as("LEFT")
-        .join(rightDF.as("RIGHT"), col("LEFT.columnID") === col("RIGHT.rowID"))
-        .count
-
-      leftDF.write.parquet(s"$basePath/e2/left")
-      rightDF.write.parquet(s"$basePath/e2/right")
+      leftDF.write.bucketBy(interNumParts, "columnID").saveAsTable("left")
+      rightDF.write.bucketBy(interNumParts, "rowID").saveAsTable("right")
     }
 
     val dataTotalSeconds = timeToDisk / math.pow(10, 3)
@@ -59,8 +44,8 @@ class E2(interNumParts: Int)(implicit spark: SparkSession) {
     )
 
     val (_, timeToMultiply: Long) = timedBlock {
-      val leftDF = spark.read.parquet(s"$basePath/e2/left")
-      val rightDF = spark.read.parquet(s"$basePath/e2/right")
+      val leftDF = spark.read.table("left")
+      val rightDF = spark.read.table("right")
 
       val res = leftDF.multiply(rightDF, interNumParts)
 

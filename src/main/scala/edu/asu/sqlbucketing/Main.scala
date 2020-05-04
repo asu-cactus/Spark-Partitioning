@@ -1,12 +1,9 @@
-package edu.asu.sparkpartitioning
+package edu.asu.sqlbucketing
 
-import edu.asu.sparkpartitioning.experiments.{E1, E2, E3}
-import edu.asu.sparkpartitioning.utils.MatrixOps.PairedOps
-import edu.asu.sparkpartitioning.utils.MatrixPartitioners.IndexedPartitioner
-import edu.asu.sparkpartitioning.utils.Parser.MatrixEntry
+import edu.asu.sqlbucketing.experiments._
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.SparkConf
 
 object Main {
 
@@ -33,30 +30,29 @@ object Main {
     System.setProperty("spark.hadoop.dfs.replication", "1")
 
     val conf = new SparkConf()
-      .setAppName(s"rdd_multiplication_$experiment")
+      .setAppName(s"bucket_multiplication_$experiment")
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .set("spark.history.fs.logDirectory", historyDir)
       .set("spark.eventLog.enabled", "true")
-      .set("spark.default.parallelism", numOfParts.toString)
+      .set("spark.default.parallelism", "80")
       .set("spark.eventLog.dir", historyDir)
-      .registerKryoClasses(
-        Array(
-          classOf[RDD[MatrixEntry]],
-          classOf[MatrixEntry],
-          classOf[PairedOps]
-        )
-      )
 
-    implicit val sc: SparkContext = new SparkContext(conf)
-
-    val matPartitioner = new IndexedPartitioner(numOfParts)
+    implicit val spark: SparkSession =
+      SparkSession
+        .builder()
+        .appName("Table_Buckets")
+        .config(conf)
+        .getOrCreate()
 
     experiment match {
       case "e1" => new E1(numOfParts).execute(basePath)
-      case "e2" => new E2(numOfParts).execute(basePath, matPartitioner)
-      case "e3" => new E3(numOfParts).execute(basePath, matPartitioner)
-
+      case "e2" => new E2(numOfParts).execute(basePath)
     }
+
+    spark.sql("DROP TABLE left")
+    spark.sql("DROP TABLE right")
+    spark.sql("DROP TABLE matrix_op")
+
   }
 
 }

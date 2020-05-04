@@ -58,7 +58,7 @@ spark-submit \
 "${APP_HOME}"/lib/Spark-Partitioning-0.1-SNAPSHOT.jar \
 hdfs://172.31.19.91:9000"${4}" \
 hdfs://172.31.19.91:9000/spark/applicationHistory \
-"NO_partitioner" "${5}"
+"no_partition" "${5}"
 
 # Run Spark code for the Page Rank algorithm WITH COMMON partitioners
 spark-submit \
@@ -69,7 +69,7 @@ spark-submit \
 "${APP_HOME}"/lib/Spark-Partitioning-0.1-SNAPSHOT.jar \
 hdfs://172.31.19.91:9000"${4}" \
 hdfs://172.31.19.91:9000/spark/applicationHistory \
-"WITH_partitioner" "${5}"
+"with_partition" "${5}"
 
 # If you need to clear the page rank directory from HDFS
 # after the execution is completed, comment the command below

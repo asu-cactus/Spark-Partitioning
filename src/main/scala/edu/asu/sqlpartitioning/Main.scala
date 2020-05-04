@@ -3,7 +3,7 @@ package edu.asu.sqlpartitioning
 import edu.asu.sqlpartitioning.experiments.{E1, E2, E3}
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.{SparkConf}
+import org.apache.spark.SparkConf
 
 object Main {
 
@@ -30,15 +30,19 @@ object Main {
     System.setProperty("spark.hadoop.dfs.replication", "1")
 
     val conf = new SparkConf()
-      .setAppName("SQL_multiplication")
+      .setAppName(s"sql_multiplication_$experiment")
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .set("spark.history.fs.logDirectory", historyDir)
       .set("spark.eventLog.enabled", "true")
       .set("spark.default.parallelism", "80")
       .set("spark.eventLog.dir", historyDir)
 
-    implicit val ss =
-      SparkSession.builder().appName("ParquetFiles").config(conf).getOrCreate()
+    implicit val spark: SparkSession =
+      SparkSession
+        .builder()
+        .appName("ParquetFiles")
+        .config(conf)
+        .getOrCreate()
 
     experiment match {
       case "e1" => new E1(numOfParts).execute(basePath)

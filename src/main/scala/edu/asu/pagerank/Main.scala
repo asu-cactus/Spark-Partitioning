@@ -19,7 +19,7 @@ object Main {
     val partStatus = args(2)
     val numOfIters = args(3).toInt
 
-    if (!(partStatus == "WITH_partitioner" || partStatus == "NO_partitioner")) {
+    if (!(partStatus == "with_partition" || partStatus == "no_partition")) {
       throw new IllegalArgumentException(
         "Allowed values for 3rd position arguments are - CO_partitioned" +
           s" or NO_partition. Provided: $partStatus"

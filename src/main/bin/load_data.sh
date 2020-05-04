@@ -19,7 +19,7 @@ input_checks() {
   # help for usage of the script
   if [ "$1" == "-h" ]; 
   then
-    echo "Usage: $(basename "${0}") {r1} {c1} {r2} {c2} {WORK_FLOW = (SQL, SPARK)} {BASE_PATH}"
+    echo "Usage: $(basename "${0}") {r1} {c1} {r2} {c2} {WORK_FLOW = (RDD, SPARK)} {BASE_PATH}"
     exit 0
   fi
 
@@ -116,8 +116,8 @@ main() {
   # running the workflow according to input to convert to either objectfiles or parquet files
   case $WORK_FLOW in
 
-  "SPARK")
-    echo "SPARK"
+  "RDD")
+    echo "RDD"
     spark-submit \
     --class edu.asu.sparkpartitioning.TextToObjectFiles \
     --master spark://172.31.19.91:7077 \

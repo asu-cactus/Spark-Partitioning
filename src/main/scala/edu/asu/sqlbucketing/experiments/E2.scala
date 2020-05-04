@@ -49,7 +49,7 @@ class E2(interNumParts: Int)(implicit spark: SparkSession) {
 
       val res = leftDF.multiply(rightDF, interNumParts)
 
-      res.write.saveAsTable("matrix_op")
+      res.write.parquet(s"$basePath/e2/matrix_op")
     }
 
     val multiplyTotalSeconds = timeToMultiply / math.pow(10, 3)

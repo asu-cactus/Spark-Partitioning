@@ -3,7 +3,7 @@ package edu.asu.sqlbucketing.experiments
 import edu.asu.sqlpartitioning.utils.ExtraOps.timedBlock
 import edu.asu.sqlpartitioning.utils.MatrixOps._
 import org.apache.log4j.Logger
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.SparkSession
 
 /**
  * This class implements the E1 (as mentioned in the document).
@@ -48,7 +48,7 @@ class E1(interNumParts: Int)(implicit spark: SparkSession) {
 
       val res = leftDF.multiply(rightDF, interNumParts)
 
-      res.write.saveAsTable("matrix_op")
+      res.write.parquet(s"$basePath/e1/matrix_op")
     }
 
     val multiplyTotalSeconds = timeToMultiply / math.pow(10, 3)

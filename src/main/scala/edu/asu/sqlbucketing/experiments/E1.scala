@@ -31,8 +31,8 @@ class E1(interNumParts: Int)(implicit spark: SparkSession) {
       val leftDF = spark.read.parquet(s"$basePath/common/left")
       val rightDF = spark.read.parquet(s"$basePath/common/right")
 
-      leftDF.write.saveAsTable("left")
-      rightDF.write.saveAsTable("right")
+      leftDF.createOrReplaceTempView("left")
+      rightDF.createOrReplaceTempView("right")
     }
 
     val dataTotalSeconds = timeToDisk / math.pow(10, 3)

@@ -4,6 +4,7 @@ import edu.asu.sqlpartitioning.utils.ExtraOps.timedBlock
 import edu.asu.sqlpartitioning.utils.MatrixOps._
 import org.apache.log4j.Logger
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions.col
 
 /**
  * This class implements the E1 (as mentioned in the document).
@@ -31,8 +32,13 @@ class E2(interNumParts: Int)(implicit spark: SparkSession) {
       val leftDF = spark.read.parquet(s"$basePath/common/left")
       val rightDF = spark.read.parquet(s"$basePath/common/right")
 
-      leftDF.write.bucketBy(interNumParts, "columnID").saveAsTable("left")
-      rightDF.write.bucketBy(interNumParts, "rowID").saveAsTable("right")
+      leftDF
+        .repartition(interNumParts, col("columnID"))
+        .createOrReplaceTempView("left")
+
+      rightDF
+        .repartition(interNumParts, col("rowID"))
+        .createOrReplaceTempView("right")
     }
 
     val dataTotalSeconds = timeToDisk / math.pow(10, 3)

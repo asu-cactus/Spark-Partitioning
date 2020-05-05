@@ -46,8 +46,6 @@ object Main {
 
     spark.sql("DROP TABLE left")
     spark.sql("DROP TABLE right")
-    spark.sql("DROP TABLE matrix_op")
-
   }
 
 }

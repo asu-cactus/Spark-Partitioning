@@ -7,7 +7,7 @@ object Main {
 
   def main(args: Array[String]): Unit = {
 
-    if (args.length != 4) {
+    if (args.length != 5) {
       throw new IllegalArgumentException(
         "Base path for storing data and spark history log directory are expected." +
           s"\nProvide: ${args.toList}"
@@ -17,6 +17,7 @@ object Main {
     val historyDir = args(1)
     val partStatus = args(2)
     val numOfIters = args(3).toInt
+    val api = args(4)
 
     if (!(partStatus == "with_partition" || partStatus == "no_partition")) {
       throw new IllegalArgumentException(
@@ -28,7 +29,7 @@ object Main {
     System.setProperty("spark.hadoop.dfs.replication", "1")
 
     val conf = new SparkConf()
-      .setAppName(s"pagerank_$partStatus")
+      .setAppName(s"pagerank_${partStatus}_$api")
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .set("spark.history.fs.logDirectory", historyDir)
       .set("spark.eventLog.enabled", "true")
@@ -39,23 +40,35 @@ object Main {
     val linksRDD = parsePageRankData(s"$basePath/page_rank/raw")
     val ranksRDD = linksRDD.map(urlLinks => (urlLinks._1, 1.0))
 
-    val outputRanks = partStatus match {
-      case "NO_partitioner" =>
-        pageRankIteration(linksRDD, ranksRDD, numOfIters)
-      case "WITH_partitioner" =>
-        val hashParts = new HashPartitioner(partitions = 80)
-        val partLinks = linksRDD.partitionBy(hashParts)
-        pageRankIteration(partLinks, ranksRDD, numOfIters)
+    val outputRanks = if (api == "map_values") {
+      partStatus match {
+        case "no_partition" =>
+          pageRankIterationValues(linksRDD, ranksRDD, numOfIters)
+        case "with_partition" =>
+          val hashParts = new HashPartitioner(partitions = 16)
+          val partLinks = linksRDD.partitionBy(hashParts)
+          pageRankIterationValues(partLinks, ranksRDD, numOfIters)
+      }
+    } else {
+      partStatus match {
+        case "no_partition" =>
+          pageRankIteration(linksRDD, ranksRDD, numOfIters)
+        case "with_partition" =>
+          val hashParts = new HashPartitioner(partitions = 16)
+          val partLinks = linksRDD.partitionBy(hashParts)
+          pageRankIteration(partLinks, ranksRDD, numOfIters)
+      }
     }
 
     outputRanks
       .map(ranks => s"${ranks._1}:${ranks.toString}")
-      .saveAsTextFile(s"$basePath/page_rank/output/$partStatus")
+      .saveAsTextFile(s"$basePath/page_rank/output/${partStatus}_$api")
   }
 
   /**
    *  Method to compute ranks based on the incoming links,
    *  by iterating over the links.
+   *
    *
    * @param links URLs as key and the list of outgoing links as value.
    * @param ranks Initial rank of each URL.
@@ -63,6 +76,42 @@ object Main {
    * @return
    */
   private def pageRankIteration(
+    links: RDD[(String, Iterable[String])],
+    ranks: RDD[(String, Double)],
+    numOfIters: Int
+  ): RDD[(String, Double)] = {
+    var rankUpdates = ranks
+    for (_ <- 0 until numOfIters) {
+
+      val contributions = links
+        .join(rankUpdates)
+        .flatMap({
+          case (_, (outLinks, rank)) =>
+            val numOfOutLinks = outLinks.size
+            outLinks.map(x => (x, rank / numOfOutLinks))
+        })
+
+      rankUpdates = contributions
+        .reduceByKey(_ + _)
+        .map(x => (x._1, x._2 * 0.85 + 0.15))
+    }
+    rankUpdates
+  }
+
+  /**
+   *  Method to compute ranks based on the incoming links,
+   *  by iterating over the links.
+   *
+   *
+   * NOTE: In this implementation flatMapValues and mapValues API is
+   * used instead of map and flatMap.
+   *
+   * @param links URLs as key and the list of outgoing links as value.
+   * @param ranks Initial rank of each URL.
+   * @param numOfIters Number of iterations to converge.
+   * @return
+   */
+  private def pageRankIterationValues(
     links: RDD[(String, Iterable[String])],
     ranks: RDD[(String, Double)],
     numOfIters: Int

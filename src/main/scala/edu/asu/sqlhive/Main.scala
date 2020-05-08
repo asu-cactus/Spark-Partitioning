@@ -1,4 +1,4 @@
-package edu.asu.sqlbucketing
+package edu.asu.sqlhive
 
 import edu.asu.sqlbucketing.experiments._
 import org.apache.log4j.Logger
@@ -25,16 +25,17 @@ object Main {
     System.setProperty("spark.hadoop.dfs.replication", "1")
 
     val conf = new SparkConf()
-      .setAppName(s"bucket_multiplication_$experiment")
+      .setAppName(s"hive_multiplication_$experiment")
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .set("spark.history.fs.logDirectory", historyDir)
       .set("spark.eventLog.enabled", "true")
-      .set("spark.default.parallelism", s"$numOfParts")
+      .set("spark.default.parallelism", numOfParts.toString)
       .set("spark.eventLog.dir", historyDir)
 
     implicit val spark: SparkSession =
       SparkSession
         .builder()
+        .enableHiveSupport()
         .config(conf)
         .getOrCreate()
 

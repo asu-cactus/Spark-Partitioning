@@ -29,13 +29,12 @@ object Main {
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .set("spark.history.fs.logDirectory", historyDir)
       .set("spark.eventLog.enabled", "true")
-      .set("spark.default.parallelism", "80")
+      .set("spark.default.parallelism", numOfParts.toString)
       .set("spark.eventLog.dir", historyDir)
 
     implicit val spark: SparkSession =
       SparkSession
         .builder()
-        .appName("ParquetFiles")
         .config(conf)
         .getOrCreate()
 

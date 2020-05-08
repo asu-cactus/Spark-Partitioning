@@ -43,9 +43,6 @@ object Main {
       case "e1" => new E1(numOfParts).execute(basePath)
       case "e2" => new E2(numOfParts).execute(basePath)
     }
-
-    spark.sql("DROP TABLE left")
-    spark.sql("DROP TABLE right")
   }
 
 }

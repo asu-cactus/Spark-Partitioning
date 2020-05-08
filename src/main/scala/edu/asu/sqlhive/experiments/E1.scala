@@ -3,7 +3,7 @@ package edu.asu.sqlhive.experiments
 import edu.asu.sqlpartitioning.utils.ExtraOps.timedBlock
 import edu.asu.sqlpartitioning.utils.MatrixOps._
 import org.apache.log4j.Logger
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{SaveMode, SparkSession}
 
 /**
  * This class implements the E1 (as mentioned in the document).
@@ -31,8 +31,8 @@ private[sqlhive] class E1(interNumParts: Int)(implicit spark: SparkSession) {
       val leftDF = spark.read.parquet(s"$basePath/common/left")
       val rightDF = spark.read.parquet(s"$basePath/common/right")
 
-      leftDF.write.saveAsTable("left")
-      rightDF.write.saveAsTable("right")
+      leftDF.write.mode(SaveMode.Overwrite).saveAsTable("left")
+      rightDF.write.mode(SaveMode.Overwrite).saveAsTable("right")
     }
 
     val dataTotalSeconds = timeToDisk / math.pow(10, 3)

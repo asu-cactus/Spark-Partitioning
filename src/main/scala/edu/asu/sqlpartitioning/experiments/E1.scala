@@ -17,7 +17,9 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
  *
  * @param spark [[SparkSession]] of the application.
  */
-class E1(interNumParts: Int)(implicit spark: SparkSession) {
+private[sqlpartitioning] class E1(interNumParts: Int)(
+  implicit spark: SparkSession
+) {
 
   /**
    * Method to execute the required steps.

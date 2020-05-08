@@ -17,7 +17,9 @@ import org.apache.spark.storage.StorageLevel
  * Method [[execute()]] will do all the above mentioned steps.
  * And also calculate time required from step 3 to step 4.
  */
-class E2(interNumParts: Int)(implicit sc: SparkContext) {
+private[sparkpartitioning] class E2(interNumParts: Int)(
+  implicit sc: SparkContext
+) {
 
   /**
    * Method to execute the required steps.

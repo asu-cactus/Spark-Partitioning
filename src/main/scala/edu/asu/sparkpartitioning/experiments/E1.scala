@@ -17,7 +17,9 @@ import org.apache.spark.SparkContext
  *
  * @param sc [[SparkContext]] of the application.
  */
-class E1(interNumParts: Int)(implicit sc: SparkContext) {
+private[sparkpartitioning] class E1(interNumParts: Int)(
+  implicit sc: SparkContext
+) {
 
   /**
    * Method to execute the required steps.

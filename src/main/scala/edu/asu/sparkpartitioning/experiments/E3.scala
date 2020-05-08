@@ -16,7 +16,9 @@ import org.apache.spark.{Partitioner, SparkContext}
  * Method [[execute()]] will do all the above mentioned steps.
  * And also calculate time required from step 3 to step 4.
  */
-class E3(interNumParts: Int)(implicit sc: SparkContext) {
+private[sparkpartitioning] class E3(interNumParts: Int)(
+  implicit sc: SparkContext
+) {
 
   /**
    * Method to execute the required steps.

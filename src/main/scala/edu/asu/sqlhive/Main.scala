@@ -1,6 +1,6 @@
 package edu.asu.sqlhive
 
-import edu.asu.sqlbucketing.experiments._
+import edu.asu.sqlhive.experiments._
 import org.apache.log4j.Logger
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.SparkConf

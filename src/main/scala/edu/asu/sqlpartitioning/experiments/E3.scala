@@ -17,7 +17,9 @@ import org.apache.spark.sql.functions.col
  * Method [[execute()]] will do all the above mentioned steps.
  * And also calculate time required from step 3 to step 4.
  */
-class E3(interNumParts: Int)(implicit spark: SparkSession) {
+private[sqlpartitioning] class E3(interNumParts: Int)(
+  implicit spark: SparkSession
+) {
 
   /**
    * Method to execute the required steps.

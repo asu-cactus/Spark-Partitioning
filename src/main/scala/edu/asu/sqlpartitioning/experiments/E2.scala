@@ -1,11 +1,9 @@
 package edu.asu.sqlpartitioning.experiments
 
 import edu.asu.sqlpartitioning.utils.ExtraOps.timedBlock
-import org.apache.log4j.Logger
 import edu.asu.sqlpartitioning.utils.MatrixOps._
+import org.apache.log4j.Logger
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions._
-import org.apache.spark.storage.StorageLevel
 
 /**
  * This class implements the E1 (as mentioned in the document).
@@ -31,23 +29,12 @@ class E2(interNumParts: Int)(implicit spark: SparkSession) {
   ): Unit = {
 
     val (_, timeToDisk: Long) = timedBlock {
-      val leftDF = spark.read
-        .parquet(s"$basePath/common/left")
-        .repartition(interNumParts, col("columnID"))
-        .persist(StorageLevel.DISK_ONLY)
+      val leftDF = spark.read.parquet(s"$basePath/common/left")
 
-      val rightDF = spark.read
-        .parquet(s"$basePath/common/right")
-        .repartition(interNumParts, col("rowID"))
-        .persist(StorageLevel.DISK_ONLY)
+      val rightDF = spark.read.parquet(s"$basePath/common/right")
 
-      val dummyCount = leftDF
-        .as("LEFT")
-        .join(rightDF.as("RIGHT"), col("LEFT.columnID") === col("RIGHT.rowID"))
-        .count
-
-      leftDF.write.parquet(s"$basePath/e2/left")
-      rightDF.write.parquet(s"$basePath/e2/right")
+      leftDF.write.partitionBy("columnID").parquet(s"$basePath/e2/left")
+      rightDF.write.partitionBy("rowID").parquet(s"$basePath/e2/right")
     }
 
     val dataTotalSeconds = timeToDisk / math.pow(10, 3)

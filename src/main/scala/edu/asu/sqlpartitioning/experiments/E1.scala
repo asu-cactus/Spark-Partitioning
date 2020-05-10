@@ -50,7 +50,7 @@ private[sqlpartitioning] class E1(interNumParts: Int)(
 
       val res: DataFrame = leftDF.multiply(rightDF, interNumParts)
 
-      res.write.parquet(s"$basePath/e1/matrix_op")
+      res.count
     }
 
     val multiplyTotalSeconds = timeToMultiply / math.pow(10, 3)

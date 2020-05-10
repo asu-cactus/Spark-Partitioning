@@ -57,7 +57,7 @@ private[sparkpartitioning] class E3(interNumParts: Int)(
 
       val res = leftMat.multiply(rightMat, interNumParts)
 
-      res.saveAsObjectFile(s"$basePath/e3/multiplication_op")
+      res.count
     }
 
     val multiplyTotalSeconds = timeToMultiply / math.pow(10, 3)

@@ -58,7 +58,7 @@ private[sqlpartitioning] class E3(interNumParts: Int)(
 
       val res = leftDF.multiply(rightDF, interNumParts)
 
-      res.write.parquet(s"$basePath/e3/multiplication_op")
+      res.count
     }
 
     val multiplyTotalSeconds = timeToMultiply / math.pow(10, 3)

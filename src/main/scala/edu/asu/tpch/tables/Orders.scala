@@ -27,14 +27,18 @@ private[tpch] object Orders extends TableOps {
       to_date(col(O_ORDERDATE), dateFormat)
     )
 
-  override protected def parquetParts(df: DataFrame): DataFrame =
-    df.repartition(80, col(O_ORDERKEY))
+  override protected def parquetParts(
+    df: DataFrame,
+    numOfParts: Int
+  ): DataFrame =
+    df.repartition(numOfParts, col(O_ORDERKEY))
 
   override protected def parquetBuckets(
-    dfWriter: DataFrameWriter[Row]
+    dfWriter: DataFrameWriter[Row],
+    numOfParts: Int
   ): DataFrameWriter[Row] =
     dfWriter
-      .bucketBy(80, O_ORDERKEY)
+      .bucketBy(numOfParts, O_ORDERKEY)
       .sortBy(O_ORDERKEY)
 
 }

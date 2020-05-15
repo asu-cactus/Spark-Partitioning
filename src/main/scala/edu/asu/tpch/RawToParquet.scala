@@ -1,7 +1,6 @@
 package edu.asu.tpch
 
 import edu.asu.tpch.tables._
-import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 
@@ -12,28 +11,27 @@ object RawToParquet {
    * and covert the data to Parquet Format.
    */
   def main(args: Array[String]): Unit = {
-    if (args.length != 2) {
+    if (args.length != 3) {
       throw new IllegalArgumentException(
-        "Base path for storing data and spark history log directory " +
-          "is expected" +
+        "Base path for storing data, spark history log directory, and " +
+          "number of partitions is expected" +
           s"\nProvide: ${args.toList}"
       )
     }
     val basePath = args(0)
     val historyDir = args(1)
-
-    System.setProperty("spark.hadoop.dfs.replication", "1")
+    val numOfParts = args(2).toInt
 
     val conf = new SparkConf()
-      .setAppName(s"tpch_convert_RAW_PARQUET")
+      .setAppName(s"tpch_convert_raw_parquet")
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .set("spark.history.fs.logDirectory", historyDir)
       .set("spark.eventLog.enabled", "true")
-      .set("spark.default.parallelism", "80")
       .set("spark.eventLog.dir", historyDir)
 
     implicit val spark: SparkSession = SparkSession
       .builder()
+      .enableHiveSupport()
       .config(conf)
       .getOrCreate()
 
@@ -47,24 +45,24 @@ object RawToParquet {
     Region.rawToParquet(basePath)
     Supplier.rawToParquet(basePath)
 
-    Customer.rawToParquetWithParts(basePath)
-    Lineitem.rawToParquetWithParts(basePath)
-    Nation.rawToParquetWithParts(basePath)
-    Orders.rawToParquetWithParts(basePath)
-    Part.rawToParquetWithParts(basePath)
-    Partsupp.rawToParquetWithParts(basePath)
-    Region.rawToParquetWithParts(basePath)
-    Supplier.rawToParquetWithParts(basePath)
+    Customer.rawToParquetWithParts(basePath, numOfParts)
+    Lineitem.rawToParquetWithParts(basePath, numOfParts)
+    Nation.rawToParquetWithParts(basePath, numOfParts)
+    Orders.rawToParquetWithParts(basePath, numOfParts)
+    Part.rawToParquetWithParts(basePath, numOfParts)
+    Partsupp.rawToParquetWithParts(basePath, numOfParts)
+    Region.rawToParquetWithParts(basePath, numOfParts)
+    Supplier.rawToParquetWithParts(basePath, numOfParts)
 
-    // TODO: Fix the issue, it takes too long to write files
-//    Customer.rawToParquetWithBuckets(basePath)
-//    Lineitem.rawToParquetWithBuckets(basePath)
-//    Nation.rawToParquetWithBuckets(basePath)
-//    Orders.rawToParquetWithBuckets(basePath)
-//    Part.rawToParquetWithBuckets(basePath)
-//    Partsupp.rawToParquetWithBuckets(basePath)
-//    Region.rawToParquetWithBuckets(basePath)
-//    Supplier.rawToParquetWithBuckets(basePath)
+    // Parse and write to Hive tables
+    Customer.rawToParquetWithBuckets(basePath, numOfParts)
+    Lineitem.rawToParquetWithBuckets(basePath, numOfParts)
+    Nation.rawToParquetWithBuckets(basePath, numOfParts)
+    Orders.rawToParquetWithBuckets(basePath, numOfParts)
+    Part.rawToParquetWithBuckets(basePath, numOfParts)
+    Partsupp.rawToParquetWithBuckets(basePath, numOfParts)
+    Region.rawToParquetWithBuckets(basePath, numOfParts)
+    Supplier.rawToParquetWithBuckets(basePath, numOfParts)
   }
 
 }

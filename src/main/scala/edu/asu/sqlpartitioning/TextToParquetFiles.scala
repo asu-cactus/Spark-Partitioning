@@ -1,7 +1,6 @@
 package edu.asu.sqlpartitioning
 
 import edu.asu.sqlpartitioning.utils.Parser.readMatrix
-import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
@@ -19,14 +18,11 @@ object TextToParquetFiles {
     val basePath = args(0)
     val historyDir = args(1)
 
-    System.setProperty("spark.hadoop.dfs.replication", "1")
-
     val conf = new SparkConf()
       .setAppName("parsing_text_to_parquet_files")
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .set("spark.history.fs.logDirectory", historyDir)
       .set("spark.eventLog.enabled", "true")
-      .set("spark.default.parallelism", "80")
       .set("spark.eventLog.dir", historyDir)
 
     implicit val spark: SparkSession =

@@ -120,11 +120,12 @@ main() {
     echo "RDD"
     spark-submit \
     --class edu.asu.sparkpartitioning.TextToObjectFiles \
-    --master spark://172.31.19.91:7077 \
+    --conf spark.default.parallelism="${SPARK_DEFAULT_PAR}" \
+    --master spark://"${SPARK_MASTER}" \
     --deploy-mode client \
     "${APP_HOME}"/lib/Spark-Partitioning-0.1-SNAPSHOT.jar \
-    hdfs://172.31.19.91:9000"${BASE_PATH}" \
-    hdfs://172.31.19.91:9000/spark/applicationHistory
+    hdfs://"${HADOOP_MASTER}${BASE_PATH}" \
+    hdfs://"${HADOOP_MASTER}"/spark/applicationHistory
     ;;
 
   "SQL")
@@ -132,11 +133,12 @@ main() {
 
     spark-submit \
     --class edu.asu.sqlpartitioning.TextToParquetFiles \
-    --master spark://172.31.19.91:7077 \
+    --conf spark.default.parallelism="${SPARK_DEFAULT_PAR}" \
+    --master spark://"${SPARK_MASTER}" \
     --deploy-mode client \
     "${APP_HOME}"/lib/Spark-Partitioning-0.1-SNAPSHOT.jar \
-    hdfs://172.31.19.91:9000"${BASE_PATH}" \
-    hdfs://172.31.19.91:9000/spark/applicationHistory
+    hdfs://"${HADOOP_MASTER}${BASE_PATH}" \
+    hdfs://"${HADOOP_MASTER}"/spark/applicationHistory
     ;;
   esac
 

@@ -43,14 +43,18 @@ object Lineitem extends TableOps {
         to_date(col(L_RECEIPTDATE), dateFormat)
       )
 
-  override protected def parquetParts(df: DataFrame): DataFrame =
-    df.repartition(80, col(L_ORDERKEY))
+  override protected def parquetParts(
+    df: DataFrame,
+    numOfParts: Int
+  ): DataFrame =
+    df.repartition(numOfParts, col(L_ORDERKEY))
 
   override protected def parquetBuckets(
-    dfWriter: DataFrameWriter[Row]
+    dfWriter: DataFrameWriter[Row],
+    numOfParts: Int
   ): DataFrameWriter[Row] =
     dfWriter
-      .bucketBy(80, L_ORDERKEY)
+      .bucketBy(numOfParts, L_ORDERKEY)
       .sortBy(L_ORDERKEY)
 
 }

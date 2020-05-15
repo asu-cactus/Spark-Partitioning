@@ -42,10 +42,10 @@ hdfs dfs -rm -r -skipTrash "${1}"/query_op
 # and convert it to Parquet format.
 spark-submit \
 --class edu.asu.tpch.Main \
---master spark://172.31.19.91:7077 \
---conf spark.default.parallelism="80" \
+--master spark://"${SPARK_MASTER}" \
+--conf spark.default.parallelism="${SPARK_DEFAULT_PAR}" \
 --deploy-mode client \
 "${APP_HOME}"/lib/Spark-Partitioning-0.1-SNAPSHOT.jar \
-hdfs://172.31.19.91:9000"${1}" \
-hdfs://172.31.19.91:9000/spark/applicationHistory \
+hdfs://"${HADOOP_MASTER}${1}" \
+hdfs://"${HADOOP_MASTER}"/spark/applicationHistory \
 "${2}" "${3}"

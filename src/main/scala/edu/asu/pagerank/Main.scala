@@ -21,12 +21,10 @@ object Main {
 
     if (!(partStatus == "with_partition" || partStatus == "no_partition")) {
       throw new IllegalArgumentException(
-        "Allowed values for 3rd position arguments are - CO_partitioned" +
-          s" or NO_partition. Provided: $partStatus"
+        "Allowed values for 3rd position arguments are - with_partition" +
+          s" or no_partition. Provided: $partStatus"
       )
     }
-
-    System.setProperty("spark.hadoop.dfs.replication", "1")
 
     val conf = new SparkConf()
       .setAppName(s"pagerank_${partStatus}_$api")

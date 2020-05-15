@@ -29,18 +29,17 @@ object Main {
     }
 
     implicit val log: Logger = Logger.getLogger("TPC_H_Spark")
-    System.setProperty("spark.hadoop.dfs.replication", "1")
 
     val conf = new SparkConf()
-      .setAppName(s"tpch_performance_$queryToRun")
+      .setAppName(s"tpch_${partType}_$queryToRun")
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .set("spark.history.fs.logDirectory", historyDir)
       .set("spark.eventLog.enabled", "true")
-      .set("spark.default.parallelism", "80")
       .set("spark.eventLog.dir", historyDir)
 
     implicit val spark: SparkSession = SparkSession
       .builder()
+      .enableHiveSupport()
       .config(conf)
       .getOrCreate()
 

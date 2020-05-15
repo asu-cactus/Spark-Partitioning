@@ -22,14 +22,12 @@ object Main {
     val experiment = args(3)
 
     implicit val log: Logger = Logger.getLogger("MatrixMultiplication")
-    System.setProperty("spark.hadoop.dfs.replication", "1")
 
     val conf = new SparkConf()
       .setAppName(s"sql_multiplication_$experiment")
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .set("spark.history.fs.logDirectory", historyDir)
       .set("spark.eventLog.enabled", "true")
-      .set("spark.default.parallelism", numOfParts.toString)
       .set("spark.eventLog.dir", historyDir)
 
     implicit val spark: SparkSession =

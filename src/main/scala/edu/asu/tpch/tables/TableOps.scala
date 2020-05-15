@@ -65,9 +65,10 @@ private[tpch] trait TableOps {
    * @param spark [[SparkSession]] application entry point
    */
   def rawToParquetWithParts(
-    basePath: String
+    basePath: String,
+    numOfParts: Int
   )(implicit spark: SparkSession): Unit =
-    parquetParts(getRawTableDf(basePath, spark)).write
+    parquetParts(getRawTableDf(basePath, spark), numOfParts).write
       .parquet(s"$basePath/parquet_parts/$getParquetDirName")
 
   /**
@@ -78,10 +79,11 @@ private[tpch] trait TableOps {
    * @param spark [[SparkSession]] application entry point
    */
   def rawToParquetWithBuckets(
-    basePath: String
+    basePath: String,
+    numOfParts: Int
   )(implicit spark: SparkSession): Unit =
-    parquetParts(getRawTableDf(basePath, spark))
-      .createOrReplaceGlobalTempView(s"$getParquetDirName")
+    parquetBuckets(getRawTableDf(basePath, spark).write, numOfParts)
+      .saveAsTable(s"$getParquetDirName")
 
   /**
    * Method to apply some partitioning before writing
@@ -90,7 +92,8 @@ private[tpch] trait TableOps {
    * @param df [[DataFrame]] of the data
    * @return
    */
-  protected def parquetParts(df: DataFrame): DataFrame = df.repartition(80)
+  protected def parquetParts(df: DataFrame, numOfParts: Int): DataFrame =
+    df.repartition(numOfParts)
 
   /**
    * Method to apply some bucketing before writing
@@ -100,7 +103,8 @@ private[tpch] trait TableOps {
    * @return
    */
   protected def parquetBuckets(
-    dfWriter: DataFrameWriter[Row]
+    dfWriter: DataFrameWriter[Row],
+    numOfParts: Int
   ): DataFrameWriter[Row] =
     dfWriter
 
@@ -141,6 +145,6 @@ private[tpch] trait TableOps {
   def readTableFromBuckets(
     basePath: String
   )(implicit spark: SparkSession): DataFrame =
-    spark.table(s"$getParquetDirName")
+    spark.read.table(s"$getParquetDirName")
 
 }

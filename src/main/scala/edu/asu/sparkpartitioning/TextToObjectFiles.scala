@@ -1,7 +1,6 @@
 package edu.asu.sparkpartitioning
 
 import edu.asu.sparkpartitioning.utils.Parser.{readMatrix, MatrixEntry}
-import org.apache.log4j.{Level, Logger}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.rdd.RDD
 
@@ -18,14 +17,11 @@ object TextToObjectFiles {
     val basePath = args(0)
     val historyDir = args(1)
 
-    System.setProperty("spark.hadoop.dfs.replication", "1")
-
     val conf = new SparkConf()
       .setAppName("parsing_text_to_object_files")
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .set("spark.history.fs.logDirectory", historyDir)
       .set("spark.eventLog.enabled", "true")
-      .set("spark.default.parallelism", "80")
       .set("spark.eventLog.dir", historyDir)
 
     implicit val sc: SparkContext = new SparkContext(conf)

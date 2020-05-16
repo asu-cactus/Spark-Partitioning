@@ -33,11 +33,13 @@ private[sqlhive] class E2(interNumParts: Int)(implicit spark: SparkSession) {
 
       leftDF.write
         .mode(SaveMode.Overwrite)
-        .bucketBy(16, "columnID")
+        .bucketBy(interNumParts, "columnID")
+        .sortBy("columnID")
         .saveAsTable("left")
       rightDF.write
         .mode(SaveMode.Overwrite)
-        .bucketBy(16, "rowID")
+        .bucketBy(interNumParts, "rowID")
+        .sortBy("rowID")
         .saveAsTable("right")
     }
 

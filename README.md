@@ -9,7 +9,6 @@ or `zprofile` or `profile` depending on which system you are using. `SPARK_DEFAU
 is used to set a value to `spark.default.parallelism` configuration while running teh 
 spark applications through the provided shell scripts.
 
-    ```
         # JAVA configuration
         export JAVA_HOM="/usr/lib/jvm/java-8-openjdk-amd64"
         
@@ -30,7 +29,6 @@ spark applications through the provided shell scripts.
         export HADOOP_MASTER="172.31.19.91:9000"
         export SPARK_MASTER="172.31.19.91:7077"
         export SPARK_DEFAULT_PAR="16"
-    ```
 
 #### Steps to execute the experiments based on matrix multiplication.
 

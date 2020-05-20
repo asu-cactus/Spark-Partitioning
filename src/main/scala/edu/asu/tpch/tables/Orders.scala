@@ -34,11 +34,12 @@ private[tpch] object Orders extends TableOps {
     df.repartition(numOfParts, col(O_ORDERKEY))
 
   override protected def parquetBuckets(
-    dfWriter: DataFrameWriter[Row],
+    df: DataFrame,
     numOfParts: Int
   ): DataFrameWriter[Row] =
-    dfWriter
-      .bucketBy(numOfParts, O_ORDERKEY)
+    df.repartition(numOfParts, col(O_ORDERKEY))
+      .write
       .sortBy(O_ORDERKEY)
+      .bucketBy(numOfParts, O_ORDERKEY)
 
 }

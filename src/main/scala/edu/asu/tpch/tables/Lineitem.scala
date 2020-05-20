@@ -50,11 +50,12 @@ object Lineitem extends TableOps {
     df.repartition(numOfParts, col(L_ORDERKEY))
 
   override protected def parquetBuckets(
-    dfWriter: DataFrameWriter[Row],
+    df: DataFrame,
     numOfParts: Int
   ): DataFrameWriter[Row] =
-    dfWriter
-      .bucketBy(numOfParts, L_ORDERKEY)
+    df.repartition(numOfParts, col(L_ORDERKEY))
+      .write
       .sortBy(L_ORDERKEY)
+      .bucketBy(numOfParts, L_ORDERKEY)
 
 }

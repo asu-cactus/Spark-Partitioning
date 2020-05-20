@@ -9,11 +9,11 @@ import org.apache.spark.sql.SparkSession
 object Main {
 
   def main(args: Array[String]): Unit = {
-    if (args.length != 4) {
+    if (args.length != 5) {
       throw new IllegalArgumentException(
-        "Base path for storing data, spark history log directory, query and " +
-          "data partition type to read" +
-          "to execute are expected" +
+        "Base path for storing data, spark history log directory, query, " +
+          "data partition type to read and number of partitions " +
+          "are the expected parameters" +
           s"\nProvide: ${args.toList}"
       )
     }
@@ -21,6 +21,7 @@ object Main {
     val historyDir = args(1)
     val queryToRun = args(2)
     val partType = args(3)
+    val numOfParts = args(4).toInt
 
     val queryNum = queryToRun match {
       case "all"      => 0
@@ -35,6 +36,7 @@ object Main {
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .set("spark.history.fs.logDirectory", historyDir)
       .set("spark.eventLog.enabled", "true")
+      .set("spark.sql.shuffle.partitions", numOfParts.toString)
       .set("spark.eventLog.dir", historyDir)
 
     implicit val spark: SparkSession = SparkSession
@@ -46,14 +48,14 @@ object Main {
     val tableDfMap = partType match {
       case "none" =>
         Map(
-          "customer" -> Customer.readTableParquet(basePath),
-          "lineitem" -> Lineitem.readTableParquet(basePath),
-          "nation" -> Nation.readTableParquet(basePath),
-          "orders" -> Orders.readTableParquet(basePath),
-          "part" -> Part.readTableParquet(basePath),
-          "partsupp" -> Partsupp.readTableParquet(basePath),
-          "region" -> Region.readTableParquet(basePath),
-          "supplier" -> Supplier.readTableParquet(basePath)
+          "customer" -> Customer.readTable(basePath),
+          "lineitem" -> Lineitem.readTable(basePath),
+          "nation" -> Nation.readTable(basePath),
+          "orders" -> Orders.readTable(basePath),
+          "part" -> Part.readTable(basePath),
+          "partsupp" -> Partsupp.readTable(basePath),
+          "region" -> Region.readTable(basePath),
+          "supplier" -> Supplier.readTable(basePath)
         )
 
       case "parts" =>

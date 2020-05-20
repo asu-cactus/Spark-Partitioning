@@ -21,7 +21,7 @@ then
 fi
 
 # checking if the number of args to the script are proper
-if [ $# -lt 2 ]
+if [ $# -lt 4 ]
 then
   echo "Missing Operand"
   echo "Run $(basename "${0}") -h for usage"
@@ -32,6 +32,7 @@ echo "Your Input :- "
 echo "BASE_PATH - ${1}"
 echo "QUERY_NUM - ${2}"
 echo "PART_TYPE - ${3}"
+echo "NUM_OF_PARTS - ${4}"
 
 PWD="$(pwd)"
 
@@ -48,4 +49,4 @@ spark-submit \
 "${APP_HOME}"/lib/Spark-Partitioning-0.1-SNAPSHOT.jar \
 hdfs://"${HADOOP_MASTER}${1}" \
 hdfs://"${HADOOP_MASTER}"/spark/applicationHistory \
-"${2}" "${3}"
+"${2}" "${3}" "${4}"

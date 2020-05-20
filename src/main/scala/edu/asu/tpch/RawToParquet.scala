@@ -27,6 +27,7 @@ object RawToParquet {
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .set("spark.history.fs.logDirectory", historyDir)
       .set("spark.eventLog.enabled", "true")
+      .set("spark.sql.shuffle.partitions", numOfParts.toString)
       .set("spark.eventLog.dir", historyDir)
 
     implicit val spark: SparkSession = SparkSession

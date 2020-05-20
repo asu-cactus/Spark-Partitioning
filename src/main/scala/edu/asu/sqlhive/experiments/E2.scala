@@ -4,6 +4,7 @@ import edu.asu.sqlpartitioning.utils.ExtraOps.timedBlock
 import edu.asu.sqlpartitioning.utils.MatrixOps._
 import org.apache.log4j.Logger
 import org.apache.spark.sql.{SaveMode, SparkSession}
+import org.apache.spark.sql.functions.col
 
 /**
  * This class implements the E1 (as mentioned in the document).
@@ -31,15 +32,20 @@ private[sqlhive] class E2(interNumParts: Int)(implicit spark: SparkSession) {
       val leftDF = spark.read.parquet(s"$basePath/common/left")
       val rightDF = spark.read.parquet(s"$basePath/common/right")
 
-      leftDF.write
+      leftDF
+        .repartition(interNumParts, col("columnID"))
+        .write
         .mode(SaveMode.Overwrite)
-        .bucketBy(interNumParts, "columnID")
         .sortBy("columnID")
+        .bucketBy(interNumParts, "columnID")
         .saveAsTable("left")
-      rightDF.write
+
+      rightDF
+        .repartition(interNumParts, col("rowID"))
+        .write
         .mode(SaveMode.Overwrite)
-        .bucketBy(interNumParts, "rowID")
         .sortBy("rowID")
+        .bucketBy(interNumParts, "rowID")
         .saveAsTable("right")
     }
 

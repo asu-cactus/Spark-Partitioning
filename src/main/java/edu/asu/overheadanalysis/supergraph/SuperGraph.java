@@ -49,16 +49,13 @@ class Node {
     public void setRandom() {
         Random random = new Random();
         boolean allZeros = true;
-        for (int j = 0; j < size; j++) {
-            adj.set(j, pos == j ? 0 : random.nextInt(2));
+        for (int j = 0; j < pos; j++) {
+            adj.set(j, random.nextInt(2));
             allZeros = adj.get(j) == 0;
         }
 
-        if (allZeros) {
-            int j = random.nextInt(size);
-            if (j == pos) {
-                j = (j + 1) % size;
-            }
+        if (allZeros && pos > 0) {
+            int j = random.nextInt(pos);
             adj.set(j, 1);
         }
     }

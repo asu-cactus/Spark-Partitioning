@@ -19,7 +19,8 @@ enum Color {
 }
 
 class Node {
-    ArrayList<Integer> adj;
+    HashMap<Color, Integer> adj;
+//    ArrayList<Integer> adj;
     int size;
     int pos;
     Color color;
@@ -35,28 +36,29 @@ class Node {
     public Node(int m, int n) {
         pos = m;
         size = n;
-        adj = new ArrayList<>(Arrays.asList(new Integer[n]));
-        Collections.fill(adj, 0);
+        adj = new HashMap<>();
     }
 
     public void print() {
         System.out.print(color.toString() + ": ");
-        for (int i = 0; i < size; i++)
-            System.out.print(adj.get(i) + ", ");
+        for (Color color : adj.keySet()) {
+            if (adj.get(color) == 1)
+                System.out.print(color.toString() + ", ");
+        }
         System.out.print("\n");
     }
 
-    public void setRandom() {
+    public void setRandom(Color[] colorList) {
         Random random = new Random();
         boolean allZeros = true;
         for (int j = 0; j < pos; j++) {
-            adj.set(j, random.nextInt(2));
-            allZeros = adj.get(j) == 0;
+            adj.put(colorList[j], random.nextInt(2));
+            allZeros = adj.get(colorList[j]) == 0;
         }
 
         if (allZeros && pos > 0) {
             int j = random.nextInt(pos);
-            adj.set(j, 1);
+            adj.put(colorList[j], 1);
         }
     }
 }
@@ -78,7 +80,7 @@ class Graph {
 
         for (int i = 0; i < size; i++) {
             Node node = new Node(i, size);
-            node.setRandom();
+            node.setRandom(colorList);
             node.setColor(colorList[i]);
             nodes.add(node);
         }

@@ -20,7 +20,6 @@ enum Color {
 
 class Node {
     HashMap<Color, Integer> adj;
-    int size;
     int pos;
     Color color;
 
@@ -38,7 +37,6 @@ class Node {
 
     public Node(int m, int n) {
         pos = m;
-        size = n;
         adj = new HashMap<>();
     }
 
@@ -116,27 +114,33 @@ class Graph {
 
 public class SuperGraph {
     public static Graph mergeTwoGraphs(Graph a, Graph b) {
-        Graph newGraph = new Graph(Math.max(a.size, b.size));
         int aCount = 0, bCount = 0;
 
-        for (int i = 0; i < newGraph.size; i++) {
+        ArrayList<Node> nodes = new ArrayList<>();
+        for (int i = 0; aCount < a.size || bCount < b.size; i++) {
+            Node node = new Node(i, -1);
             if (aCount < a.size && bCount < b.size && a.nodes.get(aCount).getColor().equals(b.nodes.get(bCount).getColor())) {
-                newGraph.newNode(a.nodes.get(aCount).getColor(), i, newGraph.size);
-                newGraph.mergeNode(i, a.nodes.get(aCount));
-                newGraph.mergeNode(i, b.nodes.get(bCount));
+                node.setColor(a.nodes.get(aCount).getColor());
+                node.merge(a.nodes.get(aCount).adj);
+                node.merge(b.nodes.get(bCount).adj);
+                nodes.add(node);
                 aCount++;
                 bCount++;
             } else if (aCount >= a.size) {
-                newGraph.newNode(b.nodes.get(bCount).getColor(), i, newGraph.size);
-                newGraph.mergeNode(i, b.nodes.get(bCount));
+                node.setColor(b.nodes.get(bCount).getColor());
+                node.merge(b.nodes.get(bCount).adj);
+                nodes.add(node);
                 bCount++;
             } else {
-                newGraph.newNode(a.nodes.get(aCount).getColor(), i, newGraph.size);
-                newGraph.mergeNode(i, a.nodes.get(aCount));
+                node.setColor(a.nodes.get(aCount).getColor());
+                node.merge(a.nodes.get(aCount).adj);
+                nodes.add(node);
                 aCount++;
             }
         }
 
+        Graph newGraph = new Graph(nodes.size());
+        newGraph.nodes = nodes;
         return newGraph;
     }
 

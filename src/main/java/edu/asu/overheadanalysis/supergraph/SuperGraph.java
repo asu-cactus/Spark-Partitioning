@@ -35,7 +35,7 @@ class Node {
         return color;
     }
 
-    public Node(int m, int n) {
+    public Node(int m) {
         pos = m;
         adj = new HashMap<>();
     }
@@ -78,7 +78,7 @@ class Graph {
 
         ArrayList<Node> nodes = new ArrayList<>();
         for (int i = 0; aCount < a.size || bCount < b.size; i++) {
-            Node node = new Node(i, -1);
+            Node node = new Node(i);
             if (aCount < a.size && bCount < b.size && a.nodes.get(aCount).getColor().equals(b.nodes.get(bCount).getColor())) {
                 node.setColor(a.nodes.get(aCount).getColor());
                 node.merge(a.nodes.get(aCount).adj);
@@ -105,7 +105,7 @@ class Graph {
     }
 
     public void newNode(Color color, int pos, int size) {
-        Node node = new Node(pos, size);
+        Node node = new Node(pos);
         node.setColor(color);
         nodes.add(node);
     }
@@ -121,7 +121,7 @@ class Graph {
         colors.subList(0, size).toArray(colorList);
 
         for (int i = 0; i < size; i++) {
-            Node node = new Node(i, size);
+            Node node = new Node(i);
             node.setRandom(colorList);
             node.setColor(colorList[i]);
             nodes.add(node);

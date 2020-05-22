@@ -12,6 +12,8 @@
         <encoding>UTF-8</encoding>
         <project.build.name>${project.artifactId}-${project.version}</project.build.name>
         <apache.spark.version>2.4.5</apache.spark.version>
+        <java.formatter.version>2.9</java.formatter.version>
+        <junit.version>4.12</junit.version>
         <maven.shaded.plugin.version>3.0.0</maven.shaded.plugin.version>
         <scala.version>2.11.11</scala.version>
         <scala.binary.version>2.11</scala.binary.version>
@@ -53,6 +55,13 @@
             <version>${scala.test.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -98,14 +107,10 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- disable surefire -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surefire.version}</version>
-                <configuration>
-                    <skipTests>true</skipTests>
-                </configuration>
             </plugin>
             <!-- enable scalatest -->
             <plugin>
@@ -164,6 +169,18 @@
                 <executions>
                     <execution>
                         <phase>validate</phase>
+                        <goals>
+                            <goal>format</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.coveo</groupId>
+                <artifactId>fmt-maven-plugin</artifactId>
+                <version>${java.formatter.version}</version>
+                <executions>
+                    <execution>
                         <goals>
                             <goal>format</goal>
                         </goals>

@@ -1,4 +1,3 @@
 package edu.asu.overheadanalysis.graph;
 
-public abstract class Graph {
-}
+public abstract class Graph {}

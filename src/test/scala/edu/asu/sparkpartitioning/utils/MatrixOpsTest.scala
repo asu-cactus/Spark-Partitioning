@@ -1,9 +1,8 @@
 package edu.asu.sparkpartitioning.utils
 
 import edu.asu.sparkpartitioning.TestBase
-import io.github.pratikbarhate.sparklingmatrixmultiplication.TestBase
-import io.github.pratikbarhate.sparklingmatrixmultiplication.utils.MatrixOps._
-import org.apache.spark.mllib.linalg.distributed.MatrixEntry
+import edu.asu.sparkpartitioning.utils.MatrixOps._
+import edu.asu.sparkpartitioning.utils.Parser.MatrixEntry
 import org.apache.spark.rdd.RDD
 
 class MatrixOpsTest extends TestBase {
@@ -43,7 +42,7 @@ class MatrixOpsTest extends TestBase {
   private val pr0 = r0.map({ case MatrixEntry(i, j, value) => (i, (j, value)) })
 
   "Multiplication of pl0 and pr0" should "return e0 as the result" in {
-    val t0 = pl0.multiply(pr0, numOfParts = 3)
+    val t0 = pl0.multiply(pr0, 3)
     val res = t0.subtract(e0)
     assert(
       res.count() == 0,

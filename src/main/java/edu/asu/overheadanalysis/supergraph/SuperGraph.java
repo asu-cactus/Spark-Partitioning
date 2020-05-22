@@ -20,7 +20,6 @@ enum Color {
 
 class Node {
     HashMap<Color, Integer> adj;
-//    ArrayList<Integer> adj;
     int size;
     int pos;
     Color color;
@@ -102,95 +101,16 @@ class Graph {
 }
 
 public class SuperGraph {
-//    public static Color[] assignColors(int m) {
-//        List<Color> colors = Arrays.asList(Color.values());
-//        Collections.shuffle(colors);
-//        Color[] colorList = new Color[m];
-//        return colors.subList(0, m).toArray(colorList);
-//    }
-//
-//    public static Integer[][] randomMatrix(int m, int n) {
-//        Random random = new Random();
-//        Integer[][] matrix = new Integer[m][n];
-//        for (int i = 0; i < m; i++) {
-//            boolean allZeros = true;
-//            for (int j = 0; j < n; j++) {
-//                matrix[i][j] = i == j ? 0 : random.nextInt(2);
-//                allZeros = matrix[i][j] == 0;
-//            }
-//
-//            if (allZeros) {
-//                int pos = random.nextInt(n);
-//                if (pos == i) {
-//                    pos = (pos + 1) % n;
-//                }
-//                matrix[i][pos] = 1;
-//            }
-//        }
-//
-//        return matrix;
-//    }
-//
-//    public static void printMatrix(Integer[][] matrix) {
-//        for (Integer[] integers : matrix) {
-//            for (int j = 0; j < matrix[0].length; j++) {
-//                System.out.print(integers[j] + ", ");
-//            }
-//            System.out.print("\n");
-//        }
-//    }
-//
-//    public static void printColors(Color[] colors) {
-//        for (int i = 0; i < colors.length; i++) {
-//            System.out.print(colors[i].toString() + ", ");
-//        }
-//        System.out.print("\n");
-//    }
-
     public static void main(String[] args) {
-        int nodes = 4;
-        Graph graph = new Graph(nodes);
-        graph.setRandom();
-        graph.print();
+        int graph_count = 4;
+        Random random = new Random();
 
-        graph.sort();
-        System.out.println("---------------------------------------------------");
-
-        graph.print();
-
-//        int nodes = 4;
-//        Integer[][] matrix = randomMatrix(nodes, nodes);
-//        Color[] colors = assignColors(nodes);
-//
-//        printMatrix(matrix);
-//        printColors(colors);
-//
-//        ArrayList<Integer> ids = new ArrayList<Integer>();
-//        for (int i = 0; i < nodes; i++)
-//            ids.add(i);
-//        ids.sort(new Comparator<Integer>(){
-//            public int compare(Integer i, Integer j) {
-//                return colors[i].compareTo(colors[j]);
-//            }
-//        });
-//
-//        for (int i = 0; i < nodes; i++) {
-//            Color temp = colors[i];
-//            colors[i] = colors[ids.get(i)];
-//            colors[ids.get(i)] = temp;
-//        }
-//
-//        for (int i = 0; i < nodes; i++) {
-//            Integer[] temp = matrix[i];
-//            matrix[i] = matrix[ids.get(i)];
-//            matrix[ids.get(i)] = temp;
-//        }
-//
-//        for (int i = 0; i < nodes; i++)
-//            System.out.print(ids.get(i) + ", ");
-//        System.out.print("\n");
-//
-//        printMatrix(matrix);
-//        printColors(colors);
+        List<Graph> graphs = new ArrayList<>();
+        for (int i = 0; i < graph_count; i++) {
+            Graph graph = new Graph(random.nextInt(9) + 2);
+            graph.setRandom();
+            graph.sort();
+            graphs.add(graph);
+        }
     }
 }

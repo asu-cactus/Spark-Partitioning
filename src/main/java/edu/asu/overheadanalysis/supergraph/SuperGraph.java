@@ -24,6 +24,10 @@ class Node {
     int pos;
     Color color;
 
+    public void merge(HashMap<Color, Integer> newAdj) {
+        adj.putAll(newAdj);
+    }
+
     public void setColor(Color color) {
         this.color = color;
     }
@@ -63,12 +67,22 @@ class Node {
 }
 
 class Graph {
-    ArrayList<Node> nodes;
-    int size;
+    public ArrayList<Node> nodes;
+    public int size;
 
     public Graph(int size) {
         this.size = size;
         nodes = new ArrayList<Node>(size);
+    }
+
+    public void newNode(Color color, int pos, int size) {
+        Node node = new Node(pos, size);
+        node.setColor(color);
+        nodes.add(node);
+    }
+
+    public void mergeNode(int pos, Node node) {
+        nodes.get(pos).merge(node.adj);
     }
 
     public void setRandom() {
@@ -101,16 +115,54 @@ class Graph {
 }
 
 public class SuperGraph {
+    public static Graph mergeTwoGraphs(Graph a, Graph b) {
+        Graph newGraph = new Graph(Math.max(a.size, b.size));
+        int aCount = 0, bCount = 0;
+
+        for (int i = 0; i < newGraph.size; i++) {
+            if (aCount < a.size && bCount < b.size && a.nodes.get(aCount).getColor().equals(b.nodes.get(bCount).getColor())) {
+                newGraph.newNode(a.nodes.get(aCount).getColor(), i, newGraph.size);
+                newGraph.mergeNode(i, a.nodes.get(aCount));
+                newGraph.mergeNode(i, b.nodes.get(bCount));
+                aCount++;
+                bCount++;
+            } else if (aCount >= a.size) {
+                newGraph.newNode(b.nodes.get(bCount).getColor(), i, newGraph.size);
+                newGraph.mergeNode(i, b.nodes.get(bCount));
+                bCount++;
+            } else {
+                newGraph.newNode(a.nodes.get(aCount).getColor(), i, newGraph.size);
+                newGraph.mergeNode(i, a.nodes.get(aCount));
+                aCount++;
+            }
+        }
+
+        return newGraph;
+    }
+
     public static void main(String[] args) {
-        int graph_count = 4;
+        int graph_count = 2;
         Random random = new Random();
 
         List<Graph> graphs = new ArrayList<>();
+        int maxNodes = 0;
         for (int i = 0; i < graph_count; i++) {
-            Graph graph = new Graph(random.nextInt(9) + 2);
+            int size = random.nextInt(9) + 2;
+            Graph graph = new Graph(size);
+
+            if (size > maxNodes)
+                maxNodes = size;
+
             graph.setRandom();
             graph.sort();
             graphs.add(graph);
         }
+
+        graphs.get(0).print();
+        System.out.println("--------------------------------------");
+        graphs.get(1).print();
+        System.out.println("--------------------------------------");
+        Graph newGraph = mergeTwoGraphs(graphs.get(0), graphs.get(1));
+        newGraph.print();
     }
 }

@@ -23,6 +23,11 @@ class Node {
     int pos;
     Color color;
 
+    public Node(int m) {
+        pos = m;
+        adj = new HashMap<>();
+    }
+
     public void merge(HashMap<Color, Integer> newAdj) {
         adj.putAll(newAdj);
     }
@@ -33,11 +38,6 @@ class Node {
 
     public Color getColor() {
         return color;
-    }
-
-    public Node(int m) {
-        pos = m;
-        adj = new HashMap<>();
     }
 
     public void print() {
@@ -79,13 +79,27 @@ class Graph {
         ArrayList<Node> nodes = new ArrayList<>();
         for (int i = 0; aCount < a.size || bCount < b.size; i++) {
             Node node = new Node(i);
-            if (aCount < a.size && bCount < b.size && a.nodes.get(aCount).getColor().equals(b.nodes.get(bCount).getColor())) {
-                node.setColor(a.nodes.get(aCount).getColor());
-                node.merge(a.nodes.get(aCount).adj);
-                node.merge(b.nodes.get(bCount).adj);
-                nodes.add(node);
-                aCount++;
-                bCount++;
+            if (aCount < a.size && bCount < b.size) {
+
+                if (a.nodes.get(aCount).getColor().equals(b.nodes.get(bCount).getColor())) {
+                    node.setColor(a.nodes.get(aCount).getColor());
+                    node.merge(a.nodes.get(aCount).adj);
+                    node.merge(b.nodes.get(bCount).adj);
+                    nodes.add(node);
+                    aCount++;
+                    bCount++;
+                } else if (a.nodes.get(aCount).getColor().compareTo(b.nodes.get(bCount).getColor()) < 0) {
+                    node.setColor(a.nodes.get(aCount).getColor());
+                    node.merge(a.nodes.get(aCount).adj);
+                    nodes.add(node);
+                    aCount++;
+                } else {
+                    node.setColor(b.nodes.get(bCount).getColor());
+                    node.merge(b.nodes.get(bCount).adj);
+                    nodes.add(node);
+                    bCount++;
+                }
+
             } else if (aCount >= a.size) {
                 node.setColor(b.nodes.get(bCount).getColor());
                 node.merge(b.nodes.get(bCount).adj);
@@ -144,8 +158,22 @@ class Graph {
 }
 
 public class SuperGraph {
+    public static Graph kWayMerge(List<Graph> graphs) {
+        while (graphs.size() > 1) {
+            int i = 0;
+            while (i < graphs.size() - 1) {
+                Graph a = graphs.remove(0);
+                Graph b = graphs.remove(0);
+                graphs.add(Graph.mergeTwoGraphs(a, b));
+
+                i += 2;
+            }
+        }
+        return graphs.get(0);
+    }
+
     public static void main(String[] args) {
-        int graph_count = 2;
+        int graph_count = 1000000;
         Random random = new Random();
 
         List<Graph> graphs = new ArrayList<>();
@@ -162,11 +190,14 @@ public class SuperGraph {
             graphs.add(graph);
         }
 
-        graphs.get(0).print();
-        System.out.println("--------------------------------------");
-        graphs.get(1).print();
-        System.out.println("--------------------------------------");
-        Graph newGraph = Graph.mergeTwoGraphs(graphs.get(0), graphs.get(1));
+//        graphs.get(0).print();
+//        System.out.println("--------------------------------------");
+//        graphs.get(1).print();
+//        System.out.println("--------------------------------------");
+//        Graph newGraph1 = Graph.mergeTwoGraphs(graphs.get(0), graphs.get(1));
+//        newGraph1.print();
+//        System.out.println("--------------------------------------");
+        Graph newGraph = kWayMerge(graphs);
         newGraph.print();
     }
 }

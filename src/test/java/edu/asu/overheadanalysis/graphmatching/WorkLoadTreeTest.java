@@ -41,13 +41,13 @@ public class WorkLoadTreeTest {
 
   @Test
   public void testFirstTree() {
-    String s1 = t1.getSignature(new WorkLoadNode.IntNodeComparator());
+    String s1 = t1.getSignature();
     Assert.assertEquals(s1, "51016459027329");
   }
 
   @Test
   public void testSecondTree() {
-    String s2 = t2.getSignature(new WorkLoadNode.IntNodeComparator());
+    String s2 = t2.getSignature();
     System.out.println(s2);
     Assert.assertEquals(s2, "403060806176783346931245468317");
   }

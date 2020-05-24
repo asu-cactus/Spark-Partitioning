@@ -1,7 +1,6 @@
 package edu.asu.overheadanalysis.graphmatching;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 
 class WorkLoadNode {
   Integer data;
@@ -15,16 +14,5 @@ class WorkLoadNode {
   WorkLoadNode addChild(WorkLoadNode newChild) {
     this.children.add(newChild);
     return this;
-  }
-
-  static class IntNodeComparator implements Comparator<WorkLoadNode> {
-
-    public int compare(WorkLoadNode o1, WorkLoadNode o2) {
-      return o1.data - o2.data;
-    }
-
-    public boolean equals(Object obj) {
-      return false;
-    }
   }
 }

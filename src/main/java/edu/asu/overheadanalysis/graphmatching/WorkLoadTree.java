@@ -2,7 +2,9 @@ package edu.asu.overheadanalysis.graphmatching;
 
 import java.util.*;
 
-/** Tree to represent the workflow, Each node in the tree is described by {{WorkLoadNode}}. */
+/** Tree to represent the workflow,
+ * each node in the tree is described by {{WorkLoadNode}}.
+ */
 class WorkLoadTree {
   WorkLoadNode root;
 
@@ -13,11 +15,10 @@ class WorkLoadTree {
   /**
    * Method to traverse the workload tree in BFT along with order. Along with BST, at each step
    * child nodes are sorted before being added to he queue.
-   *
-   * @param comp Comparator for the nodes being sorted.
    * @return Ordered list of nodes in the tree.
    */
-  private LinkedList<WorkLoadNode> orderedTraversal(Comparator<WorkLoadNode> comp) {
+  private LinkedList<WorkLoadNode> orderedTraversal() {
+    Comparator<WorkLoadNode> comp =  new WorkNodeComparator();
     LinkedList<WorkLoadNode> res = new LinkedList<WorkLoadNode>();
     WorkLoadNode curr = this.root;
     ArrayList<WorkLoadNode> currChildren;
@@ -39,15 +40,25 @@ class WorkLoadTree {
    * Method to generate a signature from the workload tree. Isomorphic trees will have same
    * signature, which can be used for matching the two workloads.
    *
-   * @param comp Comparator for the nodes, to be sorted in order to create a signature.
    * @return String representing the workload.
    */
-  String getSignature(Comparator<WorkLoadNode> comp) {
+  String getSignature() {
     StringBuilder strBuild = new StringBuilder();
-    LinkedList<WorkLoadNode> seq = this.orderedTraversal(comp);
+    LinkedList<WorkLoadNode> seq = this.orderedTraversal();
     for (WorkLoadNode workLoadNode : seq) {
       strBuild.append(workLoadNode.data.toString());
     }
     return strBuild.toString();
+  }
+
+  private static class WorkNodeComparator implements Comparator<WorkLoadNode> {
+
+    public int compare(WorkLoadNode o1, WorkLoadNode o2) {
+      return o1.data - o2.data;
+    }
+
+    public boolean equals(Object obj) {
+      return false;
+    }
   }
 }

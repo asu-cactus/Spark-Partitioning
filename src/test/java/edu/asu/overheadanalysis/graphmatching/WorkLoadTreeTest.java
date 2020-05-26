@@ -48,7 +48,6 @@ public class WorkLoadTreeTest {
   @Test
   public void testSecondTree() {
     String s2 = t2.getSignature();
-    System.out.println(s2);
     Assert.assertEquals(s2, "403060806176783346931245468317");
   }
 }

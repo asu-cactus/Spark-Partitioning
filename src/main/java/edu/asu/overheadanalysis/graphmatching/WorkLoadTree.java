@@ -2,9 +2,7 @@ package edu.asu.overheadanalysis.graphmatching;
 
 import java.util.*;
 
-/** Tree to represent the workflow,
- * each node in the tree is described by {{WorkLoadNode}}.
- */
+/** Tree to represent the workflow, each node in the tree is described by {{WorkLoadNode}}. */
 class WorkLoadTree {
   WorkLoadNode root;
 
@@ -15,10 +13,11 @@ class WorkLoadTree {
   /**
    * Method to traverse the workload tree in BFT along with order. Along with BST, at each step
    * child nodes are sorted before being added to he queue.
+   *
    * @return Ordered list of nodes in the tree.
    */
   private LinkedList<WorkLoadNode> orderedTraversal() {
-    Comparator<WorkLoadNode> comp =  new WorkNodeComparator();
+    Comparator<WorkLoadNode> comp = new WorkNodeComparator();
     LinkedList<WorkLoadNode> res = new LinkedList<WorkLoadNode>();
     WorkLoadNode curr = this.root;
     ArrayList<WorkLoadNode> currChildren;

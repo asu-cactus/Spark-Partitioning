@@ -3,7 +3,7 @@ package edu.asu.overheadanalysis.supergraph;
 import java.util.*;
 
 public class Graph {
-    public ArrayList<Node> nodes;
+    ArrayList<Node> nodes;
 
     public Graph() {
         nodes = new ArrayList<Node>();
@@ -11,6 +11,10 @@ public class Graph {
 
     public int size() {
         return nodes.size();
+    }
+
+    public Node get(int i) {
+        return nodes.get(i);
     }
 
     public Node addNode(Color c) {

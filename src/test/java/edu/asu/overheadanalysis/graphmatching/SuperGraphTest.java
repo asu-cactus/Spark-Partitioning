@@ -28,11 +28,11 @@ public class SuperGraphTest {
         g.setRandom(9);
 
         HashSet<Color> colors = new HashSet<>();
-        for (Node node : g.nodes) {
-            colors.add(node.getColor());
+        for (int i = 0; i < g.size(); i++) {
+            colors.add(g.get(i).getColor());
         }
-        Assert.assertEquals(colors.size(), g.nodes.size());
-        Assert.assertTrue(g.nodes.size() <= Color.values().length);
+        Assert.assertEquals(colors.size(), g.size());
+        Assert.assertTrue(g.size() <= Color.values().length);
     }
 
     @Test
@@ -49,7 +49,7 @@ public class SuperGraphTest {
 
         boolean comp = true;
         for (int i = 0; i < g1.size(); i++) {
-            Node node = g1.nodes.get(i);
+            Node node = g1.get(i);
             comp &= node.getColor().equals(order[i]);
         }
         Assert.assertFalse(comp);
@@ -58,7 +58,7 @@ public class SuperGraphTest {
 
         comp = true;
         for (int i = 0; i < g1.size(); i++) {
-            Node node = g1.nodes.get(i);
+            Node node = g1.get(i);
             comp &= node.getColor().equals(order[i]);
         }
         Assert.assertTrue(comp);

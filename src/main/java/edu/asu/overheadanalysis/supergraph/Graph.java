@@ -15,18 +15,13 @@ public class Graph {
         return nodes.size();
     }
 
-    public Graph addNode(Color c) {
+    public Node addNode(Color c) {
         Node node = new Node(nodes.size());
         node.setColor(c);
         nodes.add(node);
         map.put(c, node.pos);
 
-        return this;
-    }
-
-    public Graph connect(Color c1, Color c2) {
-        nodes.get(map.get(c1)).adj.put(c2, 1);
-        return this;
+        return node;
     }
 
     public int getMapping(int i, int j) {

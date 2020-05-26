@@ -9,9 +9,14 @@ public class Node {
     int pos;
     Color color;
 
-    public Node(int m) {
+    Node(int m) {
         pos = m;
         adj = new HashMap<>();
+    }
+
+    public Node connect(Color color) {
+        adj.put(color, 1);
+        return this;
     }
 
     public int getMapping(Color color) {

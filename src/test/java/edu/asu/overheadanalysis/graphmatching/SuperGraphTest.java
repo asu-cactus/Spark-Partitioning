@@ -6,6 +6,8 @@ import edu.asu.overheadanalysis.supergraph.Node;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.HashSet;
+
 
 public class SuperGraphTest {
     @Test
@@ -25,7 +27,11 @@ public class SuperGraphTest {
         Graph g = new Graph();
         g.setRandom(9);
 
-        Assert.assertEquals(g.map.keySet().size(), g.nodes.size());
+        HashSet<Color> colors = new HashSet<>();
+        for (Node node : g.nodes) {
+            colors.add(node.getColor());
+        }
+        Assert.assertEquals(colors.size(), g.nodes.size());
         Assert.assertTrue(g.nodes.size() <= Color.values().length);
     }
 

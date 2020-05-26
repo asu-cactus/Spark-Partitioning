@@ -4,11 +4,9 @@ import java.util.*;
 
 public class Graph {
     public ArrayList<Node> nodes;
-    public HashMap<Color, Integer> map;
 
     public Graph() {
         nodes = new ArrayList<Node>();
-        map = new HashMap<>();
     }
 
     public int size() {
@@ -19,7 +17,6 @@ public class Graph {
         Node node = new Node(nodes.size());
         node.setColor(c);
         nodes.add(node);
-        map.put(c, node.pos);
 
         return node;
     }
@@ -75,7 +72,6 @@ public class Graph {
 
     public void setRandom(int size) {
         nodes = new ArrayList<>();
-        map = new HashMap<>();
         List<Color> colors = Arrays.asList(Color.values());
         Collections.shuffle(colors);
         ArrayList<Color> colorList = new ArrayList<>(colors.subList(0, size));
@@ -85,7 +81,6 @@ public class Graph {
             node.setRandom(colorList);
             node.setColor(colorList.get(i));
             nodes.add(node);
-            map.put(colorList.get(i), i);
         }
     }
 

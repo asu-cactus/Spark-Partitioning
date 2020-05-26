@@ -14,6 +14,11 @@ public class Node {
         adj = new HashMap<>();
     }
 
+    public int getMapping(Color color) {
+        Integer val = adj.get(color);
+        return val == null ? 0 : val;
+    }
+
     public void merge(HashMap<Color, Integer> newAdj) {
         adj.putAll(newAdj);
     }

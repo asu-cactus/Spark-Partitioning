@@ -30,10 +30,10 @@ public class SuperGraph {
             graphs.add(graph);
         }
 
-//        graphs.get(0).print();
-//        System.out.println("--------------------------------------");
-//        graphs.get(1).print();
-//        System.out.println("--------------------------------------");
+        graphs.get(0).print();
+        System.out.println("--------------------------------------");
+        graphs.get(1).print();
+        System.out.println("--------------------------------------");
         Graph newGraph = kWayMerge(graphs);
         newGraph.print();
     }

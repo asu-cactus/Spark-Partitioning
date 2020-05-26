@@ -4,13 +4,33 @@ import java.util.*;
 
 public class Graph {
     public ArrayList<Node> nodes;
+    public HashMap<Color, Integer> map;
 
     public Graph() {
         nodes = new ArrayList<Node>();
+        map = new HashMap<>();
     }
 
     public int size() {
         return nodes.size();
+    }
+
+    public Graph addNode(Color c) {
+        Node node = new Node(nodes.size());
+        node.setColor(c);
+        nodes.add(node);
+        map.put(c, node.pos);
+
+        return this;
+    }
+
+    public Graph connect(Color c1, Color c2) {
+        nodes.get(map.get(c1)).adj.put(c2, 1);
+        return this;
+    }
+
+    public int getMapping(int i, int j) {
+        return nodes.get(i).getMapping(nodes.get(j).color);
     }
 
     public static Graph mergeTwoGraphs(Graph a, Graph b) {
@@ -58,17 +78,9 @@ public class Graph {
         return newGraph;
     }
 
-    public void newNode(Color color, int pos, int size) {
-        Node node = new Node(pos);
-        node.setColor(color);
-        nodes.add(node);
-    }
-
-    public void mergeNode(int pos, Node node) {
-        nodes.get(pos).merge(node.adj);
-    }
-
     public void setRandom(int size) {
+        nodes = new ArrayList<>();
+        map = new HashMap<>();
         List<Color> colors = Arrays.asList(Color.values());
         Collections.shuffle(colors);
         ArrayList<Color> colorList = new ArrayList<>(colors.subList(0, size));
@@ -78,6 +90,7 @@ public class Graph {
             node.setRandom(colorList);
             node.setColor(colorList.get(i));
             nodes.add(node);
+            map.put(colorList.get(i), i);
         }
     }
 

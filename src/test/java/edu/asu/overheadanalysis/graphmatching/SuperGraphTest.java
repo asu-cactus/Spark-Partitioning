@@ -25,9 +25,8 @@ public class SuperGraphTest {
         Graph g = new Graph();
         g.setRandom(9);
 
-        HashSet<Color> colorSet = new HashSet<>(g.map.keySet());
-        Assert.assertEquals(colorSet.size(), g.nodes.size());
-        Assert.assertTrue(colorSet.size() <= Color.values().length);
+        Assert.assertEquals(g.map.keySet().size(), g.nodes.size());
+        Assert.assertTrue(g.nodes.size() <= Color.values().length);
     }
 
     @Test

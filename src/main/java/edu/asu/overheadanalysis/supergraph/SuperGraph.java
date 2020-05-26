@@ -18,7 +18,7 @@ public class SuperGraph {
     }
 
     public static void main(String[] args) {
-        int graph_count = 2;
+        int graph_count = Integer.parseInt(args[0]);
         Random random = new Random();
 
         List<Graph> graphs = new ArrayList<>();
@@ -30,10 +30,10 @@ public class SuperGraph {
             graphs.add(graph);
         }
 
-        graphs.get(0).print();
-        System.out.println("--------------------------------------");
-        graphs.get(1).print();
-        System.out.println("--------------------------------------");
+//        graphs.get(0).print();
+//        System.out.println("--------------------------------------");
+//        graphs.get(1).print();
+//        System.out.println("--------------------------------------");
         Graph newGraph = kWayMerge(graphs);
         newGraph.print();
     }

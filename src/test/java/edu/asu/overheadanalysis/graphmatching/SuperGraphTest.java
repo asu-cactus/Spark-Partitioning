@@ -2,10 +2,10 @@ package edu.asu.overheadanalysis.graphmatching;
 
 import edu.asu.overheadanalysis.supergraph.Color;
 import edu.asu.overheadanalysis.supergraph.Graph;
+import edu.asu.overheadanalysis.supergraph.Node;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.HashSet;
 
 public class SuperGraphTest {
     @Test
@@ -27,6 +27,35 @@ public class SuperGraphTest {
 
         Assert.assertEquals(g.map.keySet().size(), g.nodes.size());
         Assert.assertTrue(g.nodes.size() <= Color.values().length);
+    }
+
+    @Test
+    public void testGraphSort() {
+        Color[] order = {Color.BLUE, Color.PINK, Color.YELLOW, Color.GREEN, Color.ORANGE, Color.BROWN};
+
+        Graph g1 = new Graph();
+        g1.addNode(Color.BROWN);
+        g1.addNode(Color.YELLOW).connect(Color.BROWN);
+        g1.addNode(Color.BLUE).connect(Color.GREEN).connect(Color.ORANGE);
+        g1.addNode(Color.ORANGE).connect(Color.YELLOW);
+        g1.addNode(Color.PINK).connect(Color.BROWN).connect(Color.ORANGE).connect(Color.BLUE);
+        g1.addNode(Color.GREEN).connect(Color.BROWN);
+
+        boolean comp = true;
+        for (int i = 0; i < g1.size(); i++) {
+            Node node = g1.nodes.get(i);
+            comp &= node.getColor().equals(order[i]);
+        }
+        Assert.assertFalse(comp);
+
+        g1.sort();
+
+        comp = true;
+        for (int i = 0; i < g1.size(); i++) {
+            Node node = g1.nodes.get(i);
+            comp &= node.getColor().equals(order[i]);
+        }
+        Assert.assertTrue(comp);
     }
 
     @Test

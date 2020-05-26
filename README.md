@@ -70,6 +70,11 @@ are `none`, `parts` and `buckets`.
     |   lineitem       |   L_ORDERKEY      |
     |   orders         |   O_ORDERKEY      |
 
+#### Overhead analysis
+
+1. To execute the graph matching module use command - 
+`nohup ./Spark-Partitioning-0.1-SNAPSHOT/bin/graph_matching.sh {TOTAL_NUM_GRAPHS} {NUM_OF_IDENTICAL_GRAPHS} > logs/qraph_matching.log &`
+
 **Code style notes**
 1. Python indentation and tabs = 4 spaces. (We are using Python 3)
 2. Bash script indentation and tabs = 2 spaces.

@@ -21,6 +21,12 @@ public class Main {
     int lowerBound = Integer.parseInt(args[2]);
     int threadCount = Integer.parseInt(args[3]);
 
+    // If the total number of DAGs/Workload trees
+    // is too low, use only one thread
+    if(n < 24){
+      threadCount = 1;
+    }
+
     Random rand = new Random();
     int upperBound = (k - lowerBound) + k;
     int uniqueCount = (int) (0.4 * n);

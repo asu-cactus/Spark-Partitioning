@@ -18,17 +18,17 @@ class WorkLoadTree {
    */
   private LinkedList<WorkLoadNode> orderedTraversal() {
     Comparator<WorkLoadNode> comp = new WorkNodeComparator();
-    LinkedList<WorkLoadNode> res = new LinkedList<WorkLoadNode>();
+    LinkedList<WorkLoadNode> res = new LinkedList<>();
     WorkLoadNode curr = this.root;
     ArrayList<WorkLoadNode> currChildren;
-    Queue<WorkLoadNode> order = new LinkedList<WorkLoadNode>();
+    Queue<WorkLoadNode> order = new LinkedList<>();
     order.add(curr);
     while (!order.isEmpty()) {
       curr = order.remove();
       res.add(curr);
       currChildren = curr.children;
       if (!currChildren.isEmpty()) {
-        Collections.sort(currChildren, comp);
+        currChildren.sort(comp);
         order.addAll(currChildren);
       }
     }
@@ -50,7 +50,7 @@ class WorkLoadTree {
     return strBuild.toString();
   }
 
-  private static class WorkNodeComparator implements Comparator<WorkLoadNode> {
+  private class WorkNodeComparator implements Comparator<WorkLoadNode> {
 
     public int compare(WorkLoadNode o1, WorkLoadNode o2) {
       return o1.data - o2.data;

@@ -12,9 +12,11 @@
         <encoding>UTF-8</encoding>
         <project.build.name>${project.artifactId}-${project.version}</project.build.name>
         <apache.spark.version>2.4.5</apache.spark.version>
+        <java.version>8</java.version>
         <java.formatter.version>2.9</java.formatter.version>
         <junit.version>4.12</junit.version>
         <maven.shaded.plugin.version>3.0.0</maven.shaded.plugin.version>
+        <maven.compiler.version>3.8.1</maven.compiler.version>
         <scala.version>2.11.11</scala.version>
         <scala.binary.version>2.11</scala.binary.version>
         <scala.test.version>3.1.0</scala.test.version>
@@ -179,6 +181,15 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.version}</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>

@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class Main {
   /**
-   * {{n}} = Total number of Trees. {{k}} = Number of identical Trees.
+   * {{n}} = Total number of Trees. {{k}} = Average number of nodes in a tree.
    *
    * @param args Command line arguments.
    */
@@ -15,36 +15,56 @@ public class Main {
     int k = Integer.parseInt(args[1]);
 
     Random rand = new Random();
+    int lowerBound = 5;
+    int upperBound = (k - lowerBound) + k;
 
-    LinkedList<WorkLoadTree> lisOfTrees = new LinkedList<WorkLoadTree>();
+    LinkedList<WorkLoadTree> lisOfTrees = new LinkedList<>();
     DataGen generator = new DataGen();
+    int uniqueCount = (int) (0.4 * n);
+    int duplicateCount = n - uniqueCount;
 
-    // create a query tree and k identical trees.
-    WorkLoadTree query = generator.genRandomTree(rand.nextInt(96) + 4);
-    lisOfTrees.add(query);
-    for (int j = 0; j < k; j++) {
-      lisOfTrees.add(generator.getIdenticalTree(query));
+    // create a 40% unique trees.
+    for (int i = 0; i < uniqueCount; i++) {
+      lisOfTrees.add(generator.genRandomTree(rand.nextInt(upperBound) + lowerBound));
     }
 
-    // create a random trees with total number being n,
-    // including the previous k + 1 trees.
-    for (int i = 0; i < n - k - 1; i++) {
-      lisOfTrees.add(generator.genRandomTree(rand.nextInt(96) + 4));
+    // create rest of 60% of the total trees,
+    // such that they are identical to one of unique
+    // trees.
+    WorkLoadTree tempTree;
+    for (int i = 0; i < duplicateCount; i++) {
+      tempTree = lisOfTrees.get(rand.nextInt(uniqueCount));
+      lisOfTrees.add(generator.getIdenticalTree(tempTree));
     }
 
-    HashMap<String, Integer> signatureCount = new HashMap<String, Integer>();
+    final long start0 = System.currentTimeMillis();
+
+    // Get the signature for all the trees.
+    LinkedList<String> signatureList = new LinkedList<>();
     for (WorkLoadTree tree : lisOfTrees) {
-      String currSignature = tree.getSignature();
-      if (signatureCount.containsKey(currSignature)) {
-        signatureCount.put(currSignature, signatureCount.get(currSignature) + 1);
+      signatureList.add(tree.getSignature());
+    }
+
+    final long end0 = System.currentTimeMillis();
+    final long totalSignatureMilli = end0 - start0;
+
+    final long start1 = System.currentTimeMillis();
+
+    // Count the number of matching signatures.
+    HashMap<String, Integer> signatureCount = new HashMap<>();
+    for (String sign : signatureList) {
+      if (signatureCount.containsKey(sign)) {
+        signatureCount.put(sign, signatureCount.get(sign) + 1);
       } else {
-        signatureCount.put(currSignature, 1);
+        signatureCount.put(sign, 1);
       }
     }
 
-    System.out.println(
-        "Total number of identical "
-            + "queries including the input :: "
-            + signatureCount.get(query.getSignature()));
+    final long end1 = System.currentTimeMillis();
+    final long totalCountMilli = end1 - start1;
+
+    System.out.println("\nGraph Matching");
+    System.out.println("\nSignature generation time: " + totalSignatureMilli + " milli seconds");
+    System.out.println("\nMatching and taking counts time: " + totalCountMilli + " milli seconds");
   }
 }

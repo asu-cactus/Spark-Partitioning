@@ -22,13 +22,17 @@ public class SuperGraph {
     Random random = new Random();
 
     List<Graph> graphs = new ArrayList<>();
+    int totalNodes = 0;
     for (int i = 0; i < graph_count; i++) {
       int size = random.nextInt(9) + 2;
       Graph graph = new Graph();
       graph.setRandom(size);
       graph.sort();
       graphs.add(graph);
+      totalNodes += size;
     }
+
+    int avgNodes = totalNodes / graph_count;
 
     //        graphs.get(0).print();
     //        System.out.println("--------------------------------------");
@@ -39,7 +43,13 @@ public class SuperGraph {
     long endTime = System.currentTimeMillis();
 
     System.out.println(
-        "Merging of " + graph_count + " took " + (endTime - startTime) + " milliseconds");
+        "Merging of "
+            + graph_count
+            + " DAGS with avg nodes: "
+            + avgNodes
+            + " took "
+            + (endTime - startTime)
+            + " milliseconds");
     newGraph.print();
   }
 }

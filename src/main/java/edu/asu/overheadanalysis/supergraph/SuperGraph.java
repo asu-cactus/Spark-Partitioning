@@ -1,23 +1,48 @@
 package edu.asu.overheadanalysis.supergraph;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class SuperGraph {
-  public static Graph kWayMerge(List<Graph> graphs) {
-    while (graphs.size() > 1) {
-      int i = 0;
-      while (i < graphs.size() - 1) {
-        Graph a = graphs.remove(0);
-        Graph b = graphs.remove(0);
-        graphs.add(Graph.mergeTwoGraphs(a, b));
+  private static final ExecutorService executorService = Executors.newFixedThreadPool(8);
 
-        i += 2;
+  public static Graph kWayMerge(List<Graph> graphs)
+      throws ExecutionException, InterruptedException {
+    Collection<Future<Graph>> futures = new LinkedList<>();
+    ArrayList<Graph> tempList = new ArrayList<>();
+
+    while (graphs.size() > 1) {
+      if (graphs.size() % 2 != 0) {
+        tempList.add(graphs.remove(graphs.size() - 1));
       }
+
+      for (int i = 0; i < graphs.size(); i += 2) {
+        Graph a = graphs.get(i);
+        Graph b = graphs.get(i + 1);
+        futures.add(
+          executorService.submit(
+            () -> {
+              return Graph.mergeTwoGraphs(a, b);
+            }));
+      }
+
+      for (Future<Graph> future : futures) {
+        tempList.add(future.get());
+      }
+
+      graphs = tempList;
+      tempList = new ArrayList<>();
+      futures.clear();
     }
+
+    executorService.shutdown();
     return graphs.get(0);
   }
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws ExecutionException, InterruptedException {
     int graph_count = Integer.parseInt(args[0]);
     Random random = new Random();
 

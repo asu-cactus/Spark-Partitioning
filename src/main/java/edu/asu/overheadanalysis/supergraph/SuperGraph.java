@@ -56,6 +56,16 @@ public class SuperGraph {
     return totalNodes;
   }
 
+  public static void print(String message) {
+    System.out.println(new SimpleDateFormat("HH:mm:ss").format(new Date()) + " " + message);
+  }
+
+  /**
+   * {{graph_count}} = Total number of DAGs to be generated. {{batchSize}} = Number of DAGs to be
+   * generated and processed at a time.
+   *
+   * @param args Command line arguments.
+   */
   public static void main(String[] args) throws ExecutionException, InterruptedException {
     int graph_count = Integer.parseInt(args[0]);
     int batchSize = Integer.parseInt(args[1]);
@@ -68,18 +78,17 @@ public class SuperGraph {
 
     while (graphsLeft > 0) {
       int genCount = Math.min(graphsLeft, batchSize);
-      System.out.println(
-          new SimpleDateFormat("HH:mm:ss").format(new Date()) + " Creating batch size " + genCount);
+      print("Creating batch size " + genCount);
       totalNodes += genRandDAG(genCount, graphs);
-      System.out.println(new SimpleDateFormat("HH:mm:ss").format(new Date()) + " Batch created");
+      print("Batch created");
       graphsLeft -= genCount;
 
-      System.out.println(new SimpleDateFormat("HH:mm:ss").format(new Date()) + " Starting merge");
+      print("Starting merge");
       long startTime = System.currentTimeMillis();
       supergraphs.add(kWayMerge(graphs));
       long endTime = System.currentTimeMillis();
       totalTime += endTime - startTime;
-      System.out.println(new SimpleDateFormat("HH:mm:ss").format(new Date()) + " Merge completed");
+      print("Merge completed");
       graphs.clear();
     }
 
@@ -96,9 +105,8 @@ public class SuperGraph {
     long avgNodes = totalNodes / graph_count;
     executorService.shutdown();
 
-    System.out.println(
-        (new SimpleDateFormat("HH:mm:ss").format(new Date()))
-            + " Merging of "
+    print(
+        "Merging of "
             + graph_count
             + " DAGS with avg nodes: "
             + avgNodes

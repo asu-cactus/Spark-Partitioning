@@ -48,8 +48,12 @@ public class Node {
     Random random = new Random();
     boolean allZeros = true;
     for (int j = 0; j < pos; j++) {
-      adj.put(colorList.get(j), random.nextInt(2));
-      allZeros = adj.get(colorList.get(j)) == 0;
+      if (random.nextInt(2) == 1) {
+        adj.put(colorList.get(j), 1);
+        allZeros = false;
+      } else {
+        allZeros = true;
+      }
     }
 
     if (allZeros && pos > 0) {

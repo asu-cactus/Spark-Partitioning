@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
   /**
@@ -23,11 +24,10 @@ public class Main {
 
     // If the total number of DAGs/Workload trees
     // is too low, use only one thread
-    if(n < 24){
+    if (n < 24) {
       threadCount = 1;
     }
 
-    Random rand = new Random();
     int upperBound = (k - lowerBound) + k;
     int uniqueCount = (int) (0.4 * n);
     int duplicateCount = n - uniqueCount;
@@ -37,6 +37,7 @@ public class Main {
     List<ArrayList<WorkLoadTree>> rawSetsOfTrees = Collections.synchronizedList(new ArrayList<>());
     int threadUniqCount = uniqueCount / threadCount;
     int extraUnique = uniqueCount % threadCount;
+    System.out.println("Generating unique trees");
     for (int t = 0; t < threadCount; t++) {
       if (t == 0) {
         uniqExec.submit(
@@ -47,17 +48,23 @@ public class Main {
     }
     // wait for unique trees completion.
     uniqExec.shutdown();
-    while (!uniqExec.isTerminated()) {}
+    try {
+      uniqExec.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES);
+    } catch (InterruptedException ie) {
+      ie.printStackTrace();
+    }
+    System.out.println("Number of sets of unique DAGs: " + rawSetsOfTrees.size());
 
     // create rest of 60% of the total trees,
     // such that they are identical to one of the
     // unique trees.
+    System.out.println("Generating duplicate trees");
     ExecutorService dupExec = Executors.newFixedThreadPool(threadCount);
     int threadDupCount = duplicateCount / threadCount;
     int extraDup = duplicateCount % threadCount;
     WorkLoadTree tempTree;
     for (int t = 0; t < threadCount; t++) {
-      tempTree = rawSetsOfTrees.get(t).get(rand.nextInt(threadUniqCount));
+      tempTree = rawSetsOfTrees.get(t).get(0);
       if (t == 0) {
         dupExec.submit(new DuplicateTrees(threadDupCount + extraDup, rawSetsOfTrees, tempTree));
       } else {
@@ -66,7 +73,11 @@ public class Main {
     }
     // wait for duplicate trees completion.
     dupExec.shutdown();
-    while (!dupExec.isTerminated()) {}
+    try {
+      dupExec.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES);
+    } catch (InterruptedException ie) {
+      ie.printStackTrace();
+    }
 
     // Get the signature for all the trees.
     final long start0 = System.currentTimeMillis();
@@ -78,7 +89,11 @@ public class Main {
     }
     // wait for signature generation to complete.
     signExec.shutdown();
-    while (!signExec.isTerminated()) {}
+    try {
+      signExec.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES);
+    } catch (InterruptedException ie) {
+      ie.printStackTrace();
+    }
     final long end0 = System.currentTimeMillis();
     final long totalSignatureMilli = end0 - start0;
 
@@ -93,7 +108,11 @@ public class Main {
       matchExec.submit(new MatchingSignatures(signsSet, signatureCount));
     }
     matchExec.shutdown();
-    while (!matchExec.isTerminated()) {}
+    try {
+      matchExec.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES);
+    } catch (InterruptedException ie) {
+      ie.printStackTrace();
+    }
     final long end1 = System.currentTimeMillis();
     final long totalCountMilli = end1 - start1;
 
@@ -123,8 +142,9 @@ public class Main {
     public void run() {
       ArrayList<WorkLoadTree> treeList = new ArrayList<>();
       try {
+        System.out.println("Unique Thread");
         for (int i = 0; i < num; i++) {
-          treeList.add(generator.genRandomTree(rand.nextInt(upper) + lower));
+          treeList.add(generator.genRandomTree(rand.nextInt(upper - lower) + lower));
         }
         treeSets.add(treeList);
       } catch (Exception ex) {
@@ -150,6 +170,7 @@ public class Main {
     @Override
     public void run() {
       try {
+        System.out.println("Duplicate Thread");
         ArrayList<WorkLoadTree> treeList = new ArrayList<>();
         for (int i = 0; i < num; i++) {
           treeList.add(generator.getIdenticalTree(this.original));
@@ -175,6 +196,7 @@ public class Main {
     @Override
     public void run() {
       try {
+        System.out.println("Signature Generation Thread");
         ArrayList<String> signList = new ArrayList<>();
         for (WorkLoadTree tree : treesToProcess) {
           signList.add(tree.getSignature());
@@ -200,6 +222,7 @@ public class Main {
     @Override
     public void run() {
       try {
+        System.out.println("Matching Thread");
         for (String sign : signToProcess) {
           if (countMap.containsKey(sign)) {
             countMap.put(sign, countMap.get(sign) + 1);

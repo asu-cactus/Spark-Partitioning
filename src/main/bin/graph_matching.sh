@@ -17,12 +17,13 @@ APP_HOME="$(dirname "${SCRIPT_DIRECTORY}")"
 if [ "${1}" == "-h" ];
 then
   echo "Usage: $(basename "${0}") {Total number of tree} \
-  {Average Number of nodes} {Lower Bound} {Number of Threads}"
+  {Average Number of nodes} {Lower Bound} {Number of Threads} \
+  {Batch Size}"
   exit 0
 fi
 
 # checking if the number of args to the script are proper
-if [ $# -lt 4 ]
+if [ $# -lt 5 ]
 then
   echo "Missing Operand"
   echo "Run $(basename "${0}") -h for usage"
@@ -34,6 +35,8 @@ echo "Total number of trees - ${1}"
 echo "Average Number of nodes - ${2}"
 echo "Lower Bound - ${3}"
 echo "Number of Threads - ${4}"
+echo "Batch Size - ${5}"
 
 java -cp "${APP_HOME}"/lib/Spark-Partitioning-0.1-SNAPSHOT.jar \
-edu.asu.overheadanalysis.graphmatching.Main "${1}" "${2}" "${3}" "${4}"
+edu.asu.overheadanalysis.graphmatching.Main \
+"${1}" "${2}" "${3}" "${4}" "${5}"

@@ -73,7 +73,7 @@ are `none`, `parts` and `buckets`.
 #### Overhead analysis
 
 1. To execute the graph matching module use command - 
-`nohup ./Spark-Partitioning-0.1-SNAPSHOT/bin/graph_matching.sh {TOTAL_NUM_TREES} {AVG_NUM_NODES} {LOW_BOUND_NODES} {NUM_OF_THREADS} > logs/qraph_matching.log &`
+`nohup ./Spark-Partitioning-0.1-SNAPSHOT/bin/graph_matching.sh ${TOTAL_NUM_TREES} ${AVG_NUM_NODES} ${LOW_BOUND_NODES} ${NUM_OF_THREADS} ${BATCH_SIZE}> logs/qraph_matching.log &`
 
 **Code style notes**
 1. Python indentation and tabs = 4 spaces. (We are using Python 3)

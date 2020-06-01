@@ -23,11 +23,7 @@ public class SuperGraph {
       for (int i = 0; i < graphs.size(); i += 2) {
         Graph a = graphs.get(i);
         Graph b = graphs.get(i + 1);
-        futures.add(
-            executorService.submit(
-                () -> {
-                  return Graph.mergeTwoGraphs(a, b);
-                }));
+        futures.add(executorService.submit(() -> Graph.mergeTwoGraphs(a, b)));
       }
 
       for (Future<Graph> future : futures) {

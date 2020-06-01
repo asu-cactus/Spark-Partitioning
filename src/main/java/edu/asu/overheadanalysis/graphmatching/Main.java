@@ -1,18 +1,13 @@
 package edu.asu.overheadanalysis.graphmatching;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 
 public class Main {
   /**
    * {{n}} = Total number of Trees. {{k}} = Average number of nodes in a tree. {{lowerBound}} =
-   * Lower bound for the number of nodes in a tree. {{threadCount}} = Number of threads
+   * Lower bound for the number of nodes in a tree. {{threadCount}} = Number of threads {{bs}} =
+   * Batch size
    *
    * @param args Command line arguments.
    */
@@ -21,218 +16,235 @@ public class Main {
     int k = Integer.parseInt(args[1]);
     int lowerBound = Integer.parseInt(args[2]);
     int threadCount = Integer.parseInt(args[3]);
+    int bs = Integer.parseInt(args[4]);
 
-    // If the total number of DAGs/Workload trees
-    // is too low, use only one thread
-    if (n < 24) {
-      threadCount = 1;
-    }
+    // Additional iteration to process the remainder.
+    int numOfBatches = (n / bs) + 1;
+    System.out.println("Total number of batches: " + numOfBatches);
+    // Initially all the trees are yet to be processed
+    // After each batch remaining count will keep decreasing.
+    int treePoolRemaining = n;
 
     int upperBound = (k - lowerBound) + k;
-    int uniqueCount = (int) (0.4 * n);
-    int duplicateCount = n - uniqueCount;
+    DataGen generator = new DataGen();
+    Random rand = new Random();
 
-    // create a 40% unique trees.
-    ExecutorService uniqExec = Executors.newFixedThreadPool(threadCount);
-    List<ArrayList<WorkLoadTree>> rawSetsOfTrees = Collections.synchronizedList(new ArrayList<>());
-    int threadUniqCount = uniqueCount / threadCount;
-    int extraUnique = uniqueCount % threadCount;
-    System.out.println("Generating unique trees");
-    for (int t = 0; t < threadCount; t++) {
-      if (t == 0) {
-        uniqExec.submit(
-            new UniqueTrees(threadUniqCount + extraUnique, rawSetsOfTrees, upperBound, lowerBound));
-      } else {
-        uniqExec.submit(new UniqueTrees(threadUniqCount, rawSetsOfTrees, upperBound, lowerBound));
-      }
-    }
-    // wait for unique trees completion.
-    uniqExec.shutdown();
-    try {
-      uniqExec.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES);
-    } catch (InterruptedException ie) {
-      ie.printStackTrace();
-    }
-    System.out.println("Number of sets of unique DAGs: " + rawSetsOfTrees.size());
-
-    // create rest of 60% of the total trees,
-    // such that they are identical to one of the
-    // unique trees.
-    System.out.println("Generating duplicate trees");
-    ExecutorService dupExec = Executors.newFixedThreadPool(threadCount);
-    int threadDupCount = duplicateCount / threadCount;
-    int extraDup = duplicateCount % threadCount;
-    WorkLoadTree tempTree;
-    for (int t = 0; t < threadCount; t++) {
-      tempTree = rawSetsOfTrees.get(t).get(0);
-      if (t == 0) {
-        dupExec.submit(new DuplicateTrees(threadDupCount + extraDup, rawSetsOfTrees, tempTree));
-      } else {
-        dupExec.submit(new DuplicateTrees(threadDupCount, rawSetsOfTrees, tempTree));
-      }
-    }
-    // wait for duplicate trees completion.
-    dupExec.shutdown();
-    try {
-      dupExec.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES);
-    } catch (InterruptedException ie) {
-      ie.printStackTrace();
-    }
-
-    // Get the signature for all the trees.
-    final long start0 = System.currentTimeMillis();
-    System.out.println("Signature generation started");
-    ExecutorService signExec = Executors.newFixedThreadPool(threadCount);
-    List<ArrayList<String>> signatureSets = Collections.synchronizedList(new ArrayList<>());
-    for (ArrayList<WorkLoadTree> treeSets : rawSetsOfTrees) {
-      signExec.submit(new GetSignatures(treeSets, signatureSets));
-    }
-    // wait for signature generation to complete.
-    signExec.shutdown();
-    try {
-      signExec.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES);
-    } catch (InterruptedException ie) {
-      ie.printStackTrace();
-    }
-    final long end0 = System.currentTimeMillis();
-    final long totalSignatureMilli = end0 - start0;
-
-    // Count the number of matching signatures.
-    final long start1 = System.currentTimeMillis();
-    System.out.println("Matching Started");
-    ExecutorService matchExec = Executors.newFixedThreadPool(threadCount);
-
+    long totalSignatureMilli = 0;
+    long totalCountMilli = 0;
     ConcurrentHashMap<String, Integer> signatureCount = new ConcurrentHashMap<>();
 
-    for (ArrayList<String> signsSet : signatureSets) {
-      matchExec.submit(new MatchingSignatures(signsSet, signatureCount));
-    }
-    matchExec.shutdown();
-    try {
-      matchExec.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES);
-    } catch (InterruptedException ie) {
-      ie.printStackTrace();
-    }
-    final long end1 = System.currentTimeMillis();
-    final long totalCountMilli = end1 - start1;
+    for (int it = 0; it < numOfBatches; it++) {
+      System.out.println();
+      if (treePoolRemaining < bs) {
+        bs = treePoolRemaining;
+        treePoolRemaining = 0;
+      } else if (treePoolRemaining == 0) {
+        continue;
+      } else {
+        // For each batch {{bs}} number of trees are processed.
+        treePoolRemaining -= bs;
+      }
+      System.out.println("Current batch ID: " + it);
+      System.out.println("Number of Tress in current batch: " + bs);
+
+      // If the total number of DAGs/Workload trees
+      // is too low, use only one thread
+      if (bs < 24) {
+        threadCount = 1;
+      }
+      int uniqueCount = (int) (0.4 * bs);
+      int duplicateCount = bs - uniqueCount;
+      // create a 40% unique trees.
+      ExecutorService uniqExec = Executors.newFixedThreadPool(threadCount);
+      List<LinkedList<WorkLoadTree>> listsOfTrees =
+          Collections.synchronizedList(new LinkedList<>());
+      int threadUniqCount = uniqueCount / threadCount;
+      int extraUnique = uniqueCount % threadCount;
+      System.out.println("Generating unique trees");
+      int uniqNumOfThreads = 0;
+      for (int t = 0; t < threadCount; t++) {
+        ++uniqNumOfThreads;
+        if (t == 0) {
+          uniqExec.submit(
+              () ->
+                  genUniqueTrees(
+                      threadUniqCount + extraUnique,
+                      upperBound,
+                      lowerBound,
+                      generator,
+                      rand,
+                      listsOfTrees));
+        } else {
+          uniqExec.submit(
+              () ->
+                  genUniqueTrees(
+                      threadUniqCount, upperBound, lowerBound, generator, rand, listsOfTrees));
+        }
+      }
+      System.out.println("Unique trees threads: " + uniqNumOfThreads);
+      // wait for unique trees completion.
+      uniqExec.shutdown();
+      try {
+        uniqExec.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES);
+      } catch (InterruptedException ie) {
+        System.out.println("Error in generating unique trees");
+        ie.printStackTrace();
+      }
+      int numOfUniqSets = listsOfTrees.size();
+      System.out.println("Number of lists of unique DAGs: " + listsOfTrees.size());
+
+      // create rest of 60% of the total trees,
+      // such that they are identical to one of the
+      // unique trees.
+      System.out.println("Generating duplicate trees");
+      ExecutorService dupExec = Executors.newFixedThreadPool(threadCount);
+      int threadDupCount = duplicateCount / threadCount;
+      int extraDup = duplicateCount % threadCount;
+      int dupNumOfThreads = 0;
+      for (int t = 0; t < threadCount; t++) {
+        ++dupNumOfThreads;
+        if (t == 0) {
+          dupExec.submit(
+              () ->
+                  genDupTrees(
+                      threadDupCount + extraDup, numOfUniqSets, generator, rand, listsOfTrees));
+        } else {
+          dupExec.submit(
+              () -> genDupTrees(threadDupCount, numOfUniqSets, generator, rand, listsOfTrees));
+        }
+      }
+      System.out.println("Duplicate trees threads: " + dupNumOfThreads);
+      // wait for duplicate trees completion.
+      dupExec.shutdown();
+      try {
+        dupExec.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES);
+      } catch (InterruptedException ie) {
+        System.out.println("Error in generating duplicate trees");
+        ie.printStackTrace();
+      }
+
+      // Get the signature for all the trees.
+      final long start0 = System.currentTimeMillis();
+      System.out.println("Signature generation started");
+      ExecutorService signExec = Executors.newFixedThreadPool(threadCount);
+      List<LinkedList<String>> signatures = Collections.synchronizedList(new LinkedList<>());
+      int signNumOfThreads = 0;
+      for (LinkedList<WorkLoadTree> treeSets : listsOfTrees) {
+        ++signNumOfThreads;
+        signExec.submit(() -> genSignatures(treeSets, signatures));
+      }
+      System.out.println("Signature generation threads: " + signNumOfThreads);
+      // wait for signature generation to complete.
+      signExec.shutdown();
+      try {
+        signExec.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES);
+      } catch (InterruptedException ie) {
+        System.out.println("Error in generating signatures");
+        ie.printStackTrace();
+      }
+      final long end0 = System.currentTimeMillis();
+      totalSignatureMilli += end0 - start0;
+
+      // Count the number of matching signatures.
+      final long start1 = System.currentTimeMillis();
+      System.out.println("Matching Started");
+      ExecutorService matchExec = Executors.newFixedThreadPool(threadCount);
+      for (LinkedList<String> signs : signatures) {
+        matchExec.submit(() -> signMatching(signs, signatureCount));
+      }
+      // waiting for all the matching threads to finish.
+      matchExec.shutdown();
+      try {
+        matchExec.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES);
+      } catch (InterruptedException ie) {
+        System.out.println("Error in signature matching and counting");
+        ie.printStackTrace();
+      }
+      final long end1 = System.currentTimeMillis();
+      totalCountMilli += end1 - start1;
+    } // End of For-loop for each batch
 
     System.out.println("\nGraph Matching results");
-    System.out.println("Signature generation time: " + totalSignatureMilli + " milli seconds");
-    System.out.println("Matching and taking counts time: " + totalCountMilli + " milli seconds");
+    System.out.println("Signature generation time: " + totalSignatureMilli + " milliseconds");
+    System.out.println("Matching and taking counts time: " + totalCountMilli + " milliseconds");
+  } //  End of the main function
+
+  /**
+   * Method to generate unique DAGs/Trees
+   *
+   * @param num Number of unique trees to generate
+   * @param upper Upper bound on number of nodes in a tree
+   * @param lower Lower bound on the number of nodes in a tree
+   * @param generator Data Generator class instance
+   * @param rand Random number generator instance
+   * @param treeSets Sets of unique trees
+   */
+  private static void genUniqueTrees(
+      int num,
+      int upper,
+      int lower,
+      DataGen generator,
+      Random rand,
+      List<LinkedList<WorkLoadTree>> treeSets) {
+    LinkedList<WorkLoadTree> treeList = new LinkedList<>();
+    for (int i = 0; i < num; i++) {
+      treeList.add(generator.genRandomTree(rand.nextInt(upper - lower) + lower));
+    }
+    treeSets.add(treeList);
   }
 
-  /** Runnable class to create unique threes. */
-  static class UniqueTrees implements Runnable {
-
-    private final int num;
-    private int upper;
-    private int lower;
-    private DataGen generator = new DataGen();
-    private Random rand = new Random();
-    private List<ArrayList<WorkLoadTree>> treeSets;
-
-    public UniqueTrees(int n, List<ArrayList<WorkLoadTree>> trees, int u, int l) {
-      this.num = n;
-      this.upper = u;
-      this.lower = l;
-      this.treeSets = trees;
+  /**
+   * Method to get the duplicate references
+   *
+   * @param num Number of duplicate references to generate
+   * @param numOfUniqList Number of sets of unique trees
+   * @param generator Data Generator class instance
+   * @param rand Random number generator instance
+   * @param treeSets Sets of trees to process
+   */
+  private static void genDupTrees(
+      int num,
+      int numOfUniqList,
+      DataGen generator,
+      Random rand,
+      List<LinkedList<WorkLoadTree>> treeSets) {
+    WorkLoadTree original = treeSets.get(rand.nextInt(numOfUniqList)).get(rand.nextInt(10));
+    LinkedList<WorkLoadTree> treeList = new LinkedList<>();
+    for (int i = 0; i < num; i++) {
+      treeList.add(generator.getIdenticalTree(original));
     }
+    treeSets.add(treeList);
+  }
 
-    @Override
-    public void run() {
-      ArrayList<WorkLoadTree> treeList = new ArrayList<>();
-      try {
-        System.out.println("Unique Thread");
-        for (int i = 0; i < num; i++) {
-          treeList.add(generator.genRandomTree(rand.nextInt(upper - lower) + lower));
-        }
-        treeSets.add(treeList);
-      } catch (Exception ex) {
-        ex.printStackTrace();
+  /**
+   * Method to generate signatures for the given list of trees
+   *
+   * @param treesToProcess List of trees for which signature is to be generated
+   * @param signatures Sets of signatures for all the trees
+   */
+  private static void genSignatures(
+      LinkedList<WorkLoadTree> treesToProcess, List<LinkedList<String>> signatures) {
+    LinkedList<String> signList = new LinkedList<>();
+    for (WorkLoadTree tree : treesToProcess) {
+      signList.add(tree.getSignature());
+    }
+    signatures.add(signList);
+  }
+
+  /**
+   * Method for matching the signatures and counting duplicates
+   *
+   * @param signatures Sets of signatures for all the trees
+   * @param signCountMap Hash Map of signature to count
+   */
+  private static void signMatching(
+      LinkedList<String> signatures, ConcurrentHashMap<String, Integer> signCountMap) {
+    for (String sign : signatures) {
+      if (signCountMap.containsKey(sign)) {
+        signCountMap.put(sign, signCountMap.get(sign) + 1);
+      } else {
+        signCountMap.put(sign, 1);
       }
     }
   }
-
-  /** Runnable class to create duplicate trees, from the given original tree. */
-  static class DuplicateTrees implements Runnable {
-
-    private final int num;
-    private WorkLoadTree original;
-    private DataGen generator = new DataGen();
-    private List<ArrayList<WorkLoadTree>> treeSets;
-
-    public DuplicateTrees(int n, List<ArrayList<WorkLoadTree>> trees, WorkLoadTree o) {
-      this.num = n;
-      this.treeSets = trees;
-      this.original = o;
-    }
-
-    @Override
-    public void run() {
-      try {
-        System.out.println("Duplicate Thread");
-        ArrayList<WorkLoadTree> treeList = new ArrayList<>();
-        for (int i = 0; i < num; i++) {
-          treeList.add(generator.getIdenticalTree(this.original));
-        }
-        treeSets.add(treeList);
-      } catch (Exception ex) {
-        ex.printStackTrace();
-      }
-    }
-  }
-
-  /** Runnable class to generate signatures for the given sets fo trees. */
-  static class GetSignatures implements Runnable {
-
-    private ArrayList<WorkLoadTree> treesToProcess;
-    private List<ArrayList<String>> signSets;
-
-    public GetSignatures(ArrayList<WorkLoadTree> t, List<ArrayList<String>> s) {
-      this.treesToProcess = t;
-      this.signSets = s;
-    }
-
-    @Override
-    public void run() {
-      try {
-        System.out.println("Signature Generation Thread");
-        ArrayList<String> signList = new ArrayList<>();
-        for (WorkLoadTree tree : treesToProcess) {
-          signList.add(tree.getSignature());
-        }
-        signSets.add(signList);
-      } catch (Exception ex) {
-        ex.printStackTrace();
-      }
-    }
-  }
-
-  /** Runnable class for matching the given signature and counting the duplicates. */
-  static class MatchingSignatures implements Runnable {
-
-    private ArrayList<String> signToProcess;
-    private ConcurrentHashMap<String, Integer> countMap;
-
-    public MatchingSignatures(ArrayList<String> s, ConcurrentHashMap<String, Integer> map) {
-      this.signToProcess = s;
-      this.countMap = map;
-    }
-
-    @Override
-    public void run() {
-      try {
-        System.out.println("Matching Thread");
-        for (String sign : signToProcess) {
-          if (countMap.containsKey(sign)) {
-            countMap.put(sign, countMap.get(sign) + 1);
-          } else {
-            countMap.put(sign, 1);
-          }
-        }
-      } catch (Exception ex) {
-        ex.printStackTrace();
-      }
-    }
-  }
-}
+} // End of the Main class

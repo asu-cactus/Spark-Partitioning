@@ -16,20 +16,20 @@ class DataGen {
    * @return Random WorkLoadTree object.
    */
   public WorkLoadTree genRandomTree(int numOfNodes) {
-    ArrayList<WorkLoadNode> listOfNodes = new ArrayList<WorkLoadNode>(numOfNodes);
+    ArrayList<WorkLoadNode> listOfNodes = new ArrayList<>(numOfNodes);
     for (int i = 0; i < numOfNodes; i++) {
       listOfNodes.add(i, new WorkLoadNode(randGen.nextInt(100) + 1));
     }
     WorkLoadNode root = listOfNodes.remove(0);
     WorkLoadNode curr = root;
-    Queue<WorkLoadNode> genQueue = new LinkedList<WorkLoadNode>();
+    Queue<WorkLoadNode> genQueue = new LinkedList<>();
     while (!listOfNodes.isEmpty()) {
       int numOfChildren = randGen.nextInt(6) + 1;
       int nodeLen = listOfNodes.size();
       if (numOfChildren > nodeLen) {
         numOfChildren = nodeLen;
       }
-      ArrayList<WorkLoadNode> randChildNodes = new ArrayList<WorkLoadNode>(numOfChildren);
+      ArrayList<WorkLoadNode> randChildNodes = new ArrayList<>(numOfChildren);
       for (int i = 0; i < numOfChildren; i++) {
         genQueue.add(listOfNodes.get(0));
         randChildNodes.add(i, listOfNodes.remove(0));
@@ -53,7 +53,7 @@ class DataGen {
   public WorkLoadTree getIdenticalTree(WorkLoadTree tree) {
     WorkLoadNode curr = tree.root;
     ArrayList<WorkLoadNode> currChildren;
-    Queue<WorkLoadNode> queue = new LinkedList<WorkLoadNode>();
+    Queue<WorkLoadNode> queue = new LinkedList<>();
     queue.add(curr);
     while (!queue.isEmpty()) {
       curr = queue.remove();

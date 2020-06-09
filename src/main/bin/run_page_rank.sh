@@ -75,7 +75,7 @@ hdfs://"${HADOOP_MASTER}"/spark/applicationHistory \
 
 # If you need to clear the page rank directory from HDFS
 # after the execution is completed, comment the command below
-hdfs dfs -rm -r "${BASE_PATH}"/page_rank
+hdfs dfs -rm -r "${4}"/page_rank
 
 
 

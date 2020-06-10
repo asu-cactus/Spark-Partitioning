@@ -61,6 +61,9 @@ hdfs://"${HADOOP_MASTER}${4}" \
 hdfs://"${HADOOP_MASTER}"/spark/applicationHistory \
 "no_partition" "${5}"
 
+# Sleep for 5 minutes to let all the previous processes close
+sleep 5m
+
 # Run Spark code for the Page Rank algorithm WITH COMMON partitioners
 spark-submit \
 --class edu.asu.pagerank.Main \

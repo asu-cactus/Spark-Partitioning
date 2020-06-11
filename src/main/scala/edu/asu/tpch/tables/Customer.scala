@@ -18,5 +18,5 @@ private[tpch] object Customer extends TableOps {
   override protected def getSchema: StructType =
     Encoders.product[Customer].schema
   override protected def getRawDirName: String = "customer.tbl"
-  override protected def getParquetDirName: String = "customer"
+  override protected def getTableName: String = "customer"
 }

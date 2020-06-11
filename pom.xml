@@ -24,6 +24,7 @@
         <scala.formatter.version>1.0.3</scala.formatter.version>
         <scalanlp.breeze.version>0.12</scalanlp.breeze.version>
         <surefire.version>2.22.2</surefire.version>
+        <typesafe.config.version>1.4.0</typesafe.config.version>
     </properties>
 
     <dependencies>
@@ -50,6 +51,12 @@
             <artifactId>spark-mllib_${scala.binary.version}</artifactId>
             <version>${apache.spark.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.typesafe</groupId>
+            <artifactId>config</artifactId>
+            <version>${typesafe.config.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.scalatest</groupId>

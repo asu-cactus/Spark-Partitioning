@@ -8,7 +8,7 @@ class WorkLoadNode {
 
   WorkLoadNode(Integer data) {
     this.data = data;
-    this.children = new ArrayList<WorkLoadNode>(0);
+    this.children = new ArrayList<>(0);
   }
 
   WorkLoadNode addChild(WorkLoadNode newChild) {

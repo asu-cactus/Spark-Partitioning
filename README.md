@@ -53,7 +53,7 @@ Allowed values for `${EXPERIMENT}` are `e1`, `e2` or `e3`. NOTE: With `BUCKET` t
 1. Load raw TPC-H data, generated from `dbgen` to a location `${BASE_PATH}/raw_data/`.
 
 2. Convert the raw files into parquet data by running the command 
-`nohup ./bin/convert_tpch.sh ${BASE_PATH} ${NUM_OF_PARTS} > logs/tpch_data.log &`. 
+`nohup ./bin/convert_tpch.sh ${BASE_PATH} > logs/tpch_data.log &`. 
 `{NUM_OF_PARTS}` is used to create the partition files, in case of `bucketing` the variable 
 value will be used as the number of buckets.
 
@@ -63,13 +63,12 @@ If you want to run all the queries use `${QUERY_NUM}=all`, and for custom query 
 in `Custom` class use `${QUERY_NUM}=custom`. Allowed values for `${PARTITION_TYPE}` 
 are `none`, `parts` and `buckets`.
 
-4. Current partitioning and bucketing keys used:-
-
-    | *Table Name*     |   *Column Name*   |
-    |------------------|-------------------|
-    |   lineitem       |   L_ORDERKEY      |
-    |   orders         |   O_ORDERKEY      |
-
+4. Partitioning and bucketing keys are configurable by editing the `tpch.conf` file available
+in the `etc` directory within the package or in `src/resources/configurations` within the source code.
+Spark SQL `DataFrames` have case sensitive column names, all the column names are in `uppercase`.
+_NOTE:_ After editing the file in the source code building and using the new generated package is required.
+ 
+ 
 #### Overhead analysis
 
 1. To execute super graph module use command -
@@ -81,4 +80,4 @@ are `none`, `parts` and `buckets`.
 **Code style notes**
 1. Python indentation and tabs = 4 spaces. (We are using Python 3)
 2. Bash script indentation and tabs = 2 spaces.
-3. Set up the Scalafmt plugin and use the `.scalafmt.conf` for auto formatting.
+3. Set up the Scalafmt plugin and use the `.scalafmt.conf` for auto formatting scala code.

@@ -18,5 +18,5 @@ private[tpch] case class Part(
 private[tpch] object Part extends TableOps {
   override protected def getSchema: StructType = Encoders.product[Part].schema
   override protected def getRawDirName: String = "part.tbl"
-  override protected def getParquetDirName: String = "part"
+  override protected def getTableName: String = "part"
 }

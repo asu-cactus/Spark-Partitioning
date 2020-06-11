@@ -15,5 +15,5 @@ private[tpch] object Partsupp extends TableOps {
   override protected def getSchema: StructType =
     Encoders.product[Partsupp].schema
   override protected def getRawDirName: String = "partsupp.tbl"
-  override protected def getParquetDirName: String = "partsupp"
+  override protected def getTableName: String = "partsupp"
 }

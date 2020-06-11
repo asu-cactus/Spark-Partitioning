@@ -16,7 +16,7 @@ APP_HOME="$(dirname "${SCRIPT_DIRECTORY}")"
 # help for usage of the script
 if [ "$1" == "-h" ];
 then
-  echo "Usage: $(basename "${0}") {NUM_OF_PAGES} {MAX_LINKS}\
+  echo "Usage: $(basename "${0}") {NUM_OF_PAGES} {MAX_LINKS} \
   {RAW_DATA_OP_NM} {BASE_PATH} {NUM_OF_ITER}"
   exit 0
 fi
@@ -78,7 +78,7 @@ hdfs://"${HADOOP_MASTER}"/spark/applicationHistory \
 
 # If you need to clear the page rank directory from HDFS
 # after the execution is completed, comment the command below
-hdfs dfs -rm -r "${4}"/page_rank
+hdfs dfs -rm -r -skipTrash "${4}"/page_rank
 
 
 

@@ -38,5 +38,10 @@
             </includes>
             <fileMode>666</fileMode>
         </fileSet>
+        <fileSet>
+            <directory>src/main/resources/configurations</directory>
+            <outputDirectory>etc</outputDirectory>
+            <fileMode>666</fileMode>
+        </fileSet>
     </fileSets>
 </assembly>

@@ -13,5 +13,5 @@ private[tpch] case class Nation(
 private[tpch] object Nation extends TableOps {
   override protected def getSchema: StructType = Encoders.product[Nation].schema
   override protected def getRawDirName: String = "nation.tbl"
-  override protected def getParquetDirName: String = "nation"
+  override protected def getTableName: String = "nation"
 }

@@ -1,5 +1,8 @@
 package edu.asu.tpch
 
+import java.io.File
+
+import com.typesafe.config.{Config, ConfigFactory}
 import edu.asu.tpch.tables._
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
@@ -20,14 +23,14 @@ object RawToParquet {
     }
     val basePath = args(0)
     val historyDir = args(1)
-    val numOfParts = args(2).toInt
+    val configPath = args(2)
+    val configs = getConfigs(configPath)
 
     val conf = new SparkConf()
       .setAppName(s"tpch_convert_raw_parquet")
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .set("spark.history.fs.logDirectory", historyDir)
       .set("spark.eventLog.enabled", "true")
-      .set("spark.sql.shuffle.partitions", numOfParts.toString)
       .set("spark.eventLog.dir", historyDir)
 
     implicit val spark: SparkSession = SparkSession
@@ -46,24 +49,36 @@ object RawToParquet {
     Region.rawToParquet(basePath)
     Supplier.rawToParquet(basePath)
 
-    Customer.rawToParquetWithParts(basePath, numOfParts)
-    Lineitem.rawToParquetWithParts(basePath, numOfParts)
-    Nation.rawToParquetWithParts(basePath, numOfParts)
-    Orders.rawToParquetWithParts(basePath, numOfParts)
-    Part.rawToParquetWithParts(basePath, numOfParts)
-    Partsupp.rawToParquetWithParts(basePath, numOfParts)
-    Region.rawToParquetWithParts(basePath, numOfParts)
-    Supplier.rawToParquetWithParts(basePath, numOfParts)
+    Customer.rawToParquetWithParts(basePath, configs)
+    Lineitem.rawToParquetWithParts(basePath, configs)
+    Nation.rawToParquetWithParts(basePath, configs)
+    Orders.rawToParquetWithParts(basePath, configs)
+    Part.rawToParquetWithParts(basePath, configs)
+    Partsupp.rawToParquetWithParts(basePath, configs)
+    Region.rawToParquetWithParts(basePath, configs)
+    Supplier.rawToParquetWithParts(basePath, configs)
 
     // Parse and write to Hive tables
-    Customer.rawToParquetWithBuckets(basePath, numOfParts)
-    Lineitem.rawToParquetWithBuckets(basePath, numOfParts)
-    Nation.rawToParquetWithBuckets(basePath, numOfParts)
-    Orders.rawToParquetWithBuckets(basePath, numOfParts)
-    Part.rawToParquetWithBuckets(basePath, numOfParts)
-    Partsupp.rawToParquetWithBuckets(basePath, numOfParts)
-    Region.rawToParquetWithBuckets(basePath, numOfParts)
-    Supplier.rawToParquetWithBuckets(basePath, numOfParts)
+    Customer.rawToParquetWithBuckets(basePath, configs)
+    Lineitem.rawToParquetWithBuckets(basePath, configs)
+    Nation.rawToParquetWithBuckets(basePath, configs)
+    Orders.rawToParquetWithBuckets(basePath, configs)
+    Part.rawToParquetWithBuckets(basePath, configs)
+    Partsupp.rawToParquetWithBuckets(basePath, configs)
+    Region.rawToParquetWithBuckets(basePath, configs)
+    Supplier.rawToParquetWithBuckets(basePath, configs)
   }
+
+  /**
+   * Method to read configurations for partitioning the
+   * TPC-H tables
+   *
+   * @param configPath File path for the configurations.
+   * @return [[Config]] object
+   */
+  def getConfigs(configPath: String): Config =
+    ConfigFactory
+      .parseFile(new File(configPath))
+      .getConfig("tpch")
 
 }

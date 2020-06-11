@@ -17,5 +17,5 @@ private[tpch] object Supplier extends TableOps {
   override protected def getSchema: StructType =
     Encoders.product[Supplier].schema
   override protected def getRawDirName: String = "supplier.tbl"
-  override protected def getParquetDirName: String = "supplier"
+  override protected def getTableName: String = "supplier"
 }

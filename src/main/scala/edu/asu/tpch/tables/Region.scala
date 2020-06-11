@@ -12,5 +12,5 @@ private[tpch] case class Region(
 private[tpch] object Region extends TableOps {
   override protected def getSchema: StructType = Encoders.product[Region].schema
   override protected def getRawDirName: String = "region.tbl"
-  override protected def getParquetDirName: String = "region"
+  override protected def getTableName: String = "region"
 }

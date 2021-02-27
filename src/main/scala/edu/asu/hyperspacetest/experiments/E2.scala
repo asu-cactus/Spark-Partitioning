@@ -1,22 +1,25 @@
-package edu.asu.sqlbucketing.experiments
+package edu.asu.hyperspacetest.experiments
 
 import edu.asu.sqlpartitioning.utils.ExtraOps.timedBlock
 import edu.asu.sqlpartitioning.utils.MatrixOps._
 import org.apache.log4j.Logger
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions.col
+
+import com.microsoft.hyperspace._
+import com.microsoft.hyperspace.index.IndexConfig
 
 /**
  * This class implements the E1 (as mentioned in the document).
- * Step 1: Write the matrices to tables with bucketing
- * Step 2: Read the matrices
- * Step 3: Perform multiplication operation
- * Step 4: Write the result to secondary storage
+ * Step 1: Partition the matrices
+ * Step 2: Write the random matrices to secondary storage
+ * Step 3: Read the matrices
+ * Step 4: Perform multiplication operation
+ * Step 5: Write the result to secondary storage
  *
  * Method [[execute()]] will do all the above mentioned steps.
  * And also calculate time required from step 3 to step 4.
  */
-private[sqlbucketing] class E2(interNumParts: Int)(
+private[hyperspacetest] class E2(interNumParts: Int)(
   implicit spark: SparkSession
 ) {
 
@@ -31,27 +34,32 @@ private[sqlbucketing] class E2(interNumParts: Int)(
   ): Unit = {
 
     val (_, timeToDisk: Long) = timedBlock {
+
+      val hyperspace: Hyperspace = Hyperspace()
+
       val leftDF = spark.read.parquet(s"$basePath/common/left")
       val rightDF = spark.read.parquet(s"$basePath/common/right")
 
-      leftDF
-        .repartition(interNumParts, col("columnID"))
-        .createOrReplaceTempView("left")
+      val leftIndexConfig =
+        IndexConfig("leftMatrix", Seq("columnID"), Seq("rowID"))
+      val rightIndexConfig =
+        IndexConfig("rightMatrix", Seq("rowID"), Seq("columnID"))
 
-      rightDF
-        .repartition(interNumParts, col("rowID"))
-        .createOrReplaceTempView("right")
+      hyperspace.createIndex(leftDF, leftIndexConfig)
+      hyperspace.createIndex(rightDF, rightIndexConfig)
     }
 
     val dataTotalSeconds = timeToDisk / math.pow(10, 3)
     log.info(
-      s"E2 -> Time to persist random data to disk after partitioning " +
+      s"E2 -> Time to create Hyperspace indexes " +
         s"is $dataTotalSeconds seconds"
     )
 
     val (_, timeToMultiply: Long) = timedBlock {
-      val leftDF = spark.read.table("left")
-      val rightDF = spark.read.table("right")
+      spark.enableHyperspace()
+
+      val leftDF = spark.read.parquet(s"$basePath/e2/left")
+      val rightDF = spark.read.parquet(s"$basePath/e2/right")
 
       val res = leftDF.multiply(rightDF, interNumParts)
 

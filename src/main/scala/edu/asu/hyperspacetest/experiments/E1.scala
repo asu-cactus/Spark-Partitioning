@@ -1,9 +1,9 @@
-package edu.asu.sqlhive.experiments
+package edu.asu.hyperspacetest.experiments
 
 import edu.asu.sqlpartitioning.utils.ExtraOps.timedBlock
 import edu.asu.sqlpartitioning.utils.MatrixOps._
 import org.apache.log4j.Logger
-import org.apache.spark.sql.{SaveMode, SparkSession}
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
 /**
  * This class implements the E1 (as mentioned in the document).
@@ -17,7 +17,9 @@ import org.apache.spark.sql.{SaveMode, SparkSession}
  *
  * @param spark [[SparkSession]] of the application.
  */
-private[sqlhive] class E1(interNumParts: Int)(implicit spark: SparkSession) {
+private[hyperspacetest] class E1(interNumParts: Int)(
+  implicit spark: SparkSession
+) {
 
   /**
    * Method to execute the required steps.
@@ -31,30 +33,33 @@ private[sqlhive] class E1(interNumParts: Int)(implicit spark: SparkSession) {
       val leftDF = spark.read.parquet(s"$basePath/common/left")
       val rightDF = spark.read.parquet(s"$basePath/common/right")
 
-      leftDF.write.mode(SaveMode.Overwrite).saveAsTable("left")
-      rightDF.write.mode(SaveMode.Overwrite).saveAsTable("right")
+      leftDF.write.parquet(s"$basePath/e1/left")
+      rightDF.write.parquet(s"$basePath/e1/right")
     }
 
     val dataTotalSeconds = timeToDisk / math.pow(10, 3)
+    val dataMinutes = (dataTotalSeconds / 60).toLong
+    val dataSeconds = (dataTotalSeconds % 60).toInt
     log.info(
-      s"E1 -> Time to persist random data to disk is $dataTotalSeconds seconds"
+      s"E1 -> Time to persist random data to disk is $dataMinutes minutes $dataSeconds seconds"
     )
 
     val (_, timeToMultiply: Long) = timedBlock {
-      val leftDF = spark.read.table("left")
-      val rightDF = spark.read.table("right")
+      val leftDF = spark.read.parquet(s"$basePath/e1/left")
+      val rightDF = spark.read.parquet(s"$basePath/e1/right")
 
-      val res = leftDF.multiply(rightDF, interNumParts)
+      val res: DataFrame = leftDF.multiply(rightDF, interNumParts)
 
       res.count
     }
 
     val multiplyTotalSeconds = timeToMultiply / math.pow(10, 3)
+    val multiplyMinutes = (multiplyTotalSeconds / 60).toLong
+    val multiplySeconds = (multiplyTotalSeconds % 60).toInt
     log.info(
       s"E1 -> Time to multiply and persist result to disk " +
-        s"is $multiplyTotalSeconds seconds"
+        s"is $multiplyMinutes minutes $multiplySeconds seconds"
     )
-
   }
 
 }

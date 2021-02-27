@@ -9,6 +9,7 @@
     <version>0.1-SNAPSHOT</version>
 
     <properties>
+        <com.microsoft.hyperspace.version>0.4.0</com.microsoft.hyperspace.version>
         <encoding>UTF-8</encoding>
         <project.build.name>${project.artifactId}-${project.version}</project.build.name>
         <apache.spark.version>2.4.5</apache.spark.version>
@@ -63,6 +64,11 @@
             <artifactId>scalatest_${scala.binary.version}</artifactId>
             <version>${scala.test.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.hyperspace</groupId>
+            <artifactId>hyperspace-core_${scala.binary.version}</artifactId>
+            <version>${com.microsoft.hyperspace.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

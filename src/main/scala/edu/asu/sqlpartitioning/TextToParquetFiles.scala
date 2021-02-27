@@ -31,7 +31,7 @@ object TextToParquetFiles {
     val left: DataFrame = readMatrix(s"$basePath/raw/left")
     val right: DataFrame = readMatrix(s"$basePath/raw/right")
 
-    left.write.parquet(s"$basePath/common/left")
-    right.write.parquet(s"$basePath/common/right")
+    left.write.partitionBy("columnID").parquet(s"$basePath/common/left")
+    right.write.partitionBy("rowID").parquet(s"$basePath/common/right")
   }
 }

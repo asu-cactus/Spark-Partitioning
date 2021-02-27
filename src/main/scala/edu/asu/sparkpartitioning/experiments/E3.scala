@@ -40,10 +40,8 @@ private[sparkpartitioning] class E3(interNumParts: Int)(
     }
 
     val dataTotalSeconds = timeToDisk / math.pow(10, 3)
-    val dataMinutes = (dataTotalSeconds / 60).toLong
-    val dataSeconds = (dataTotalSeconds % 60).toInt
     log.info(
-      s"E3 -> Time to persist random data to disk is $dataMinutes minutes $dataSeconds seconds"
+      s"E3 -> Time to persist random data to disk is $dataTotalSeconds seconds"
     )
 
     val (_, timeToMultiply: Long) = timedBlock {
@@ -61,11 +59,9 @@ private[sparkpartitioning] class E3(interNumParts: Int)(
     }
 
     val multiplyTotalSeconds = timeToMultiply / math.pow(10, 3)
-    val multiplyMinutes = (multiplyTotalSeconds / 60).toLong
-    val multiplySeconds = (multiplyTotalSeconds % 60).toInt
     log.info(
       s"E3 -> Time to partition, multiply and persist result to " +
-        s"disk is $multiplyMinutes minutes $multiplySeconds seconds"
+        s"disk is $multiplyTotalSeconds seconds"
     )
   }
 

@@ -35,8 +35,12 @@ private[sqlpartitioning] class E2(interNumParts: Int)(
 
       val rightDF = spark.read.parquet(s"$basePath/common/right")
 
-      leftDF.write.partitionBy("columnID").parquet(s"$basePath/e2/left")
-      rightDF.write.partitionBy("rowID").parquet(s"$basePath/e2/right")
+      leftDF.write
+        .partitionBy("columnID")
+        .parquet(s"$basePath/e2/left")
+      rightDF.write
+        .partitionBy("rowID")
+        .parquet(s"$basePath/e2/right")
     }
 
     val dataTotalSeconds = timeToDisk / math.pow(10, 3)

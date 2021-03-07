@@ -12,26 +12,21 @@ object Main {
 
   def main(args: Array[String]): Unit = {
 
-    if (args.length != 4) {
+    if (args.length != 3) {
       throw new IllegalArgumentException(
-        "Base path for storing data, spark history log directory, experiment " +
+        "Base path for storing data, experiment " +
           "to execute and number of partitions is expected." +
           s"\nProvide: ${args.toList}"
       )
     }
     val basePath = args(0)
-    val historyDir = args(1)
-    val numOfParts = args(2).toInt
-    val experiment = args(3)
+    val numOfParts = args(1).toInt
+    val experiment = args(2)
 
     implicit val log: Logger = Logger.getLogger("MatrixMultiplication")
 
     val conf = new SparkConf()
       .setAppName(s"rdd_multiplication_$experiment")
-      .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
-      .set("spark.history.fs.logDirectory", historyDir)
-      .set("spark.eventLog.enabled", "true")
-      .set("spark.eventLog.dir", historyDir)
       .registerKryoClasses(
         Array(
           classOf[RDD[MatrixEntry]],

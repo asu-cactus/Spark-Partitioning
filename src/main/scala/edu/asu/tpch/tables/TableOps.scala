@@ -1,9 +1,12 @@
 package edu.asu.tpch.tables
 
-import com.typesafe.config.Config
 import org.apache.spark.sql._
-import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.types.StructType
+import scala.collection.JavaConversions._
+
+import com.typesafe.config.Config
+import com.microsoft.hyperspace.Hyperspace
+import com.microsoft.hyperspace.index.IndexConfig
 
 private[tpch] trait TableOps {
 
@@ -55,9 +58,35 @@ private[tpch] trait TableOps {
    * @param basePath Experimentation directory
    * @param spark [[SparkSession]] application entry point
    */
-  def rawToParquet(basePath: String)(implicit spark: SparkSession): Unit =
-    getRawTableDf(basePath, spark).write
-      .saveAsTable(s"$getTableName" + "_none")
+  def rawToParquetHyperspace(
+    basePath: String,
+    configs: Config,
+    hyperspace: Hyperspace
+  )(
+    implicit spark: SparkSession
+  ): Unit = {
+    val dfWriter = if (configs.hasPath(s"$getTableName")) {
+      val numOfParts = configs.getInt(s"$getTableName.num_of_partitions")
+      getRawTableDf(basePath, spark).repartition(numOfParts).write
+    } else { getRawTableDf(basePath, spark).write }
+
+    dfWriter.parquet(s"$basePath/tables/$getTableName" + "_hyperspace")
+
+    // Create the hyperspace index on the written data.
+    // Reference to the data location needs to be the same.
+    if (configs.hasPath(s"$getTableName")) {
+      val refDf = spark.read
+        .parquet(s"$basePath/tables/$getTableName" + "_hyperspace")
+      val colNames = configs.getStringList(s"$getTableName.partition_keys")
+      val proCols = configs.getStringList(s"$getTableName.projection_keys")
+      hyperspace.deleteIndex(s"$getTableName")
+      hyperspace.vacuumIndex(s"$getTableName")
+      hyperspace.createIndex(
+        refDf,
+        IndexConfig(s"$getTableName", colNames, proCols)
+      )
+    }
+  }
 
   /**
    *  Method to read raw text files and write the data
@@ -71,9 +100,16 @@ private[tpch] trait TableOps {
   def rawToParquetWithParts(
     basePath: String,
     configs: Config
-  )(implicit spark: SparkSession): Unit =
-    parquetParts(getRawTableDf(basePath, spark), configs).write
-      .saveAsTable(s"$getTableName" + "_parts")
+  )(implicit spark: SparkSession): Unit = {
+    val rawDf = getRawTableDf(basePath, spark)
+
+    val df = if (configs.hasPath(s"$getTableName")) {
+      val numOfParts = configs.getInt(s"$getTableName.num_of_partitions")
+      rawDf.repartition(numOfParts)
+    } else { rawDf.repartition() }
+
+    df.write.parquet(s"$basePath/tables/$getTableName" + "_parts")
+  }
 
   /**
    *  Method to read raw text files and write the data
@@ -84,57 +120,26 @@ private[tpch] trait TableOps {
    * @param configs TypeSafe config object which contains partition
    *                information for the TPC-H tables
    */
-  def rawToParquetWithBuckets(
+  def rawToTableWithBuckets(
     basePath: String,
     configs: Config
-  )(implicit spark: SparkSession): Unit =
-    parquetBuckets(
-      getRawTableDf(basePath, spark),
-      configs
-    ).mode(SaveMode.Overwrite)
-      .saveAsTable(s"$getTableName" + "_buckets")
+  )(implicit spark: SparkSession): Unit = {
+    val rawDf = getRawTableDf(basePath, spark)
 
-  /**
-   * Method to apply some partitioning before writing
-   * the data to disk in Parquet format.
-   *
-   * @param df [[DataFrame]] of the data
-   * @param configs TypeSafe config object which contains partition
-   *                information for the TPC-H tables
-   * @return
-   */
-  protected def parquetParts(df: DataFrame, configs: Config): DataFrame =
-    if (configs.hasPath(s"$getTableName")) {
-      val colName = configs.getString(s"$getTableName.partition_key")
+    val dfWriter = if (configs.hasPath(s"$getTableName")) {
+      val colName = configs.getStringList(s"$getTableName.partition_keys").head
       val numOfParts = configs.getInt(s"$getTableName.num_of_partitions")
-      df.repartition(numOfParts, col(colName))
-    } else {
-      df.repartition()
-    }
-
-  /**
-   * Method to apply some bucketing before writing
-   * the data to disk in Parquet format.
-   *
-   * @param df [[DataFrameWriter]] of the data
-   * @param configs TypeSafe config object which contains partition
-   *                information for the TPC-H tables
-   * @return
-   */
-  protected def parquetBuckets(
-    df: DataFrame,
-    configs: Config
-  ): DataFrameWriter[Row] =
-    if (configs.hasPath(s"$getTableName")) {
-      val colName = configs.getString(s"$getTableName.partition_key")
-      val numOfParts = configs.getInt(s"$getTableName.num_of_partitions")
-      df.repartition(numOfParts, col(colName))
+      rawDf
+        .repartition()
         .write
-        .sortBy(colName)
         .bucketBy(numOfParts, colName)
-    } else {
-      df.repartition().write
-    }
+        .sortBy(colName)
+    } else { rawDf.repartition().write }
+
+    dfWriter
+      .mode(SaveMode.Overwrite)
+      .saveAsTable(s"$getTableName" + "_buckets")
+  }
 
   /**
    * Method to read the TPC-H tables which are stored on
@@ -144,10 +149,10 @@ private[tpch] trait TableOps {
    * @param spark [[SparkSession]] application entry point
    * @return [[DataFrame]] of the table
    */
-  def readTable(
+  def readTableHyperspace(
     basePath: String
   )(implicit spark: SparkSession): DataFrame =
-    spark.read.table(s"$getTableName" + "_none")
+    spark.read.parquet(s"$basePath/tables/$getTableName" + "_hyperspace")
 
   /**
    * Method to read the TPC-H tables which are stored on
@@ -160,7 +165,7 @@ private[tpch] trait TableOps {
   def readTableFromParts(
     basePath: String
   )(implicit spark: SparkSession): DataFrame =
-    spark.read.table(s"$getTableName" + "_parts")
+    spark.read.parquet(s"$basePath/tables/$getTableName" + "_parts")
 
   /**
    * Method to read the TPC-H tables which are stored on

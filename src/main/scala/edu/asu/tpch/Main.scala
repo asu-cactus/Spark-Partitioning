@@ -6,22 +6,23 @@ import org.apache.log4j.Logger
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 
+import com.microsoft.hyperspace._
+
 object Main {
 
   def main(args: Array[String]): Unit = {
-    if (args.length != 5) {
+    if (args.length != 4) {
       throw new IllegalArgumentException(
-        "Base path for storing data, spark history log directory, query, " +
+        "Base path for storing data, query, " +
           "data partition type to read and number of partitions " +
           "are the expected parameters" +
           s"\nProvide: ${args.toList}"
       )
     }
     val basePath = args(0)
-    val historyDir = args(1)
-    val queryToRun = args(2)
-    val partType = args(3)
-    val numOfParts = args(4).toInt
+    val queryToRun = args(1)
+    val partType = args(2)
+    val numOfParts = args(3).toInt
 
     val queryNum = queryToRun match {
       case "all"      => 0
@@ -33,29 +34,26 @@ object Main {
 
     val conf = new SparkConf()
       .setAppName(s"tpch_${partType}_$queryToRun")
-      .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
-      .set("spark.history.fs.logDirectory", historyDir)
-      .set("spark.eventLog.enabled", "true")
       .set("spark.sql.shuffle.partitions", numOfParts.toString)
-      .set("spark.eventLog.dir", historyDir)
 
     implicit val spark: SparkSession = SparkSession
       .builder()
       .enableHiveSupport()
       .config(conf)
       .getOrCreate()
+      .enableHyperspace()
 
     val tableDfMap = partType match {
-      case "none" =>
+      case "hyperspace" =>
         Map(
-          "customer" -> Customer.readTable(basePath),
-          "lineitem" -> Lineitem.readTable(basePath),
-          "nation" -> Nation.readTable(basePath),
-          "orders" -> Orders.readTable(basePath),
-          "part" -> Part.readTable(basePath),
-          "partsupp" -> Partsupp.readTable(basePath),
-          "region" -> Region.readTable(basePath),
-          "supplier" -> Supplier.readTable(basePath)
+          "customer" -> Customer.readTableHyperspace(basePath),
+          "lineitem" -> Lineitem.readTableHyperspace(basePath),
+          "nation" -> Nation.readTableHyperspace(basePath),
+          "orders" -> Orders.readTableHyperspace(basePath),
+          "part" -> Part.readTableHyperspace(basePath),
+          "partsupp" -> Partsupp.readTableHyperspace(basePath),
+          "region" -> Region.readTableHyperspace(basePath),
+          "supplier" -> Supplier.readTableHyperspace(basePath)
         )
 
       case "parts" =>
@@ -122,7 +120,7 @@ object Main {
       val querySeconds = (queryTotalSeconds % 60).toInt
 
       partType match {
-        case "none" =>
+        case "hyperspace" =>
           log.info(
             s"Time take by query ${q.getClass.getCanonicalName.split("\\.").last.replace("$", "")} " +
               s"is $queryMinutes minutes $querySeconds seconds"

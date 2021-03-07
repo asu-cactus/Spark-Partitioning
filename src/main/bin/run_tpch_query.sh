@@ -48,5 +48,4 @@ spark-submit \
 --deploy-mode client \
 "${APP_HOME}"/lib/Spark-Partitioning-0.1-SNAPSHOT.jar \
 hdfs://"${HADOOP_MASTER}${1}" \
-hdfs://"${HADOOP_MASTER}"/spark/applicationHistory \
 "${2}" "${3}" "${4}"

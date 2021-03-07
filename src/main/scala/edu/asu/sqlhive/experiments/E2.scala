@@ -36,16 +36,16 @@ private[sqlhive] class E2(interNumParts: Int)(implicit spark: SparkSession) {
         .repartition(interNumParts, col("columnID"))
         .write
         .mode(SaveMode.Overwrite)
-        .sortBy("columnID")
         .bucketBy(interNumParts, "columnID")
+        .sortBy("columnID")
         .saveAsTable("left")
 
       rightDF
         .repartition(interNumParts, col("rowID"))
         .write
         .mode(SaveMode.Overwrite)
-        .sortBy("rowID")
         .bucketBy(interNumParts, "rowID")
+        .sortBy("rowID")
         .saveAsTable("right")
     }
 

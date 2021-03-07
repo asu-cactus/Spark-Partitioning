@@ -124,8 +124,7 @@ main() {
     --master spark://"${SPARK_MASTER}" \
     --deploy-mode client \
     "${APP_HOME}"/lib/Spark-Partitioning-0.1-SNAPSHOT.jar \
-    hdfs://"${HADOOP_MASTER}${BASE_PATH}" \
-    hdfs://"${HADOOP_MASTER}"/spark/applicationHistory
+    hdfs://"${HADOOP_MASTER}${BASE_PATH}"
     ;;
 
   "SQL")
@@ -137,8 +136,7 @@ main() {
     --master spark://"${SPARK_MASTER}" \
     --deploy-mode client \
     "${APP_HOME}"/lib/Spark-Partitioning-0.1-SNAPSHOT.jar \
-    hdfs://"${HADOOP_MASTER}${BASE_PATH}" \
-    hdfs://"${HADOOP_MASTER}"/spark/applicationHistory
+    hdfs://"${HADOOP_MASTER}${BASE_PATH}"
     ;;
   esac
 

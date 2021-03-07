@@ -1,13 +1,13 @@
 ### Spark-Partitioning
 
-Investigating and benchmarking how partitioning of data on HDFS will affect Spark performance
+Investigating and benchmarking how partitioning of data on secondary storage layer will affect Spark performance
 
 #### Environment Variables
 
 Configure and update the following variable in your systems `bashrc` or `bash_profile` 
-or `zprofile` or `profile` depending on which system you are using. `SPARK_DEFAULT_PAR` 
-is used to set a value to `spark.default.parallelism` configuration while running teh 
-spark applications through the provided shell scripts.
+or `zprofile` or `profile` depending on which operating system you are using. 
+`SPARK_DEFAULT_PAR` is used to set a value to `spark.default.parallelism` configuration 
+while running the spark applications through the provided shell scripts.
 
         # JAVA configuration
         export JAVA_HOM="/usr/lib/jvm/java-8-openjdk-amd64"
@@ -26,8 +26,8 @@ spark applications through the provided shell scripts.
         export HIVE_CONF_DIR="${HIVE_HOME}/conf"
         
         # Installations 
-        export HADOOP_MASTER="172.31.19.91:9000"
-        export SPARK_MASTER="172.31.19.91:7077"
+        export HADOOP_MASTER="${MASTER_NODE_IP}:9000"
+        export SPARK_MASTER="${MASTER_NODE_IP}:7077"
         export SPARK_DEFAULT_PAR="16"
 
 #### Steps to execute the experiments based on matrix multiplication.
@@ -61,13 +61,11 @@ value will be used as the number of buckets.
 `nohup run_tpch_query.sh ${BASE_PATH} ${QUERY_NUM} ${PARTITION_TYPE} > log/query_${QUERY_NUM}_${PARTITION_TYPE}.log &`. 
 If you want to run all the queries use `${QUERY_NUM}=all`, and for custom query defined 
 in `Custom` class use `${QUERY_NUM}=custom`. Allowed values for `${PARTITION_TYPE}` 
-are `none`, `parts` and `buckets`.
+are `hyperspace`, `parts` and `buckets`.
 
 4. Partitioning and bucketing keys are configurable by editing the `tpch.conf` file available
 in the `etc` directory within the package or in `src/resources/configurations` within the source code.
 Spark SQL `DataFrames` have case sensitive column names, all the column names are in `uppercase`.
-_NOTE:_ After editing the file in the source code building and using the new generated package is required.
- 
  
 #### Overhead analysis
 

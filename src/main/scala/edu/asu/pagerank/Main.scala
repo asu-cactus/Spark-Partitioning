@@ -7,16 +7,15 @@ object Main {
 
   def main(args: Array[String]): Unit = {
 
-    if (args.length != 4) {
+    if (args.length != 3) {
       throw new IllegalArgumentException(
         "Base path for storing data and spark history log directory are expected." +
           s"\nProvide: ${args.toList}"
       )
     }
     val basePath = args(0)
-    val historyDir = args(1)
-    val partStatus = args(2)
-    val numOfIters = args(3).toInt
+    val partStatus = args(1)
+    val numOfIters = args(2).toInt
 
     if (!(partStatus == "with_partition" || partStatus == "no_partition")) {
       throw new IllegalArgumentException(
@@ -25,12 +24,7 @@ object Main {
       )
     }
 
-    val conf = new SparkConf()
-      .setAppName(s"pagerank_$partStatus")
-      .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
-      .set("spark.history.fs.logDirectory", historyDir)
-      .set("spark.eventLog.enabled", "true")
-      .set("spark.eventLog.dir", historyDir)
+    val conf = new SparkConf().setAppName(s"pagerank_$partStatus")
 
     implicit val sc: SparkContext = new SparkContext(conf)
 

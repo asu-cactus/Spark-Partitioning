@@ -43,6 +43,8 @@ object Main {
       .getOrCreate()
       .enableHyperspace()
 
+    implicit val hyperspace: Hyperspace = Hyperspace()
+
     val tableDfMap = partType match {
       case "hyperspace" =>
         Map(

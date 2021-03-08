@@ -37,7 +37,7 @@ named `Spark-Partitioning-0.1-SNAPSHOT.tar.gz` with the 4 directories `bin`, `et
 Copy the `tar.gz` file to the cluster and decompress the folder.
 
 2. To create random matrices and load them to HDFS, execute the shell script 
-`nohup ./bin/load_data.sh ${ROW_LEFT} {COL_LEFT} ${ROW_RIGHT} ${COL_RIGHT} ${WORK_FLOW = (RDD, SQL)} ${BASE_PATH} > logs/load_data.log &`.
+`nohup ./bin/load_data.sh ${ROW_LEFT} {COL_LEFT} ${ROW_RIGHT} ${COL_RIGHT} ${WORK_FLOW = (RDD, SQL)} ${BASE_PATH} ${NUM_OF_PARTS} > logs/load_data.log &`.
 
 3. To execute a particular experiment, execute the shell script 
 `nohup ./bin/run_experiment.sh ${WORK_FLOW = (RDD, SQL, BUCKET, HIVE)} ${BASE_PATH} ${EXPERIMENT} ${NUM_OF_PARTITIONS} > logs/job_${EXPERIMENT}_${PARTITIONS}.log &`.
@@ -53,15 +53,14 @@ Allowed values for `${EXPERIMENT}` are `e1`, `e2` or `e3`. NOTE: With `BUCKET` t
 1. Load raw TPC-H data, generated from `dbgen` to a location `${BASE_PATH}/raw_data/`.
 
 2. Convert the raw files into parquet data by running the command 
-`nohup ./bin/convert_tpch.sh ${BASE_PATH} > logs/tpch_data.log &`. 
-`{NUM_OF_PARTS}` is used to create the partition files, in case of `bucketing` the variable 
-value will be used as the number of buckets.
+`nohup ./bin/convert_tpch.sh ${BASE_PATH} > logs/tpch_data.log &`.
 
 3. To execute TPC-H query use command 
-`nohup run_tpch_query.sh ${BASE_PATH} ${QUERY_NUM} ${PARTITION_TYPE} > log/query_${QUERY_NUM}_${PARTITION_TYPE}.log &`. 
+`nohup ./bin/run_tpch_query.sh ${BASE_PATH} ${QUERY_NUM} ${PARTITION_TYPE} {NUM_OF_PARTS} > logs/query_${QUERY_NUM}_${PARTITION_TYPE}.log &`. 
 If you want to run all the queries use `${QUERY_NUM}=all`, and for custom query defined 
 in `Custom` class use `${QUERY_NUM}=custom`. Allowed values for `${PARTITION_TYPE}` 
-are `hyperspace`, `parts` and `buckets`.
+are `hyperspace`, `parts` and `buckets`. You are required to clear the hyperspace indexes, if there are any with same names previously created.
+`{NUM_OF_PARTS}` is used to set the value for the spark configuration `spark.sql.shuffle.partitions`.
 
 4. Partitioning and bucketing keys are configurable by editing the `tpch.conf` file available
 in the `etc` directory within the package or in `src/resources/configurations` within the source code.

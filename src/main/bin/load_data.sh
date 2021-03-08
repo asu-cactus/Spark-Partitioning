@@ -19,7 +19,7 @@ input_checks() {
   # help for usage of the script
   if [ "$1" == "-h" ]; 
   then
-    echo "Usage: $(basename "${0}") {r1} {c1} {r2} {c2} {WORK_FLOW = (RDD, SPARK)} {BASE_PATH}"
+    echo "Usage: $(basename "${0}") {r1} {c1} {r2} {c2} {WORK_FLOW = (RDD, SPARK)} {BASE_PATH} {NUM_OF_PARTS}"
     exit 0
   fi
 
@@ -38,6 +38,7 @@ input_checks() {
   echo "c2 - ${4}"
   echo "Work Flow - ${5}"
   echo "Base Path - ${6}"
+  echo "Num of Parts - ${7}"
   
   # checking if c1 == r2 which is required for matrix multiplication
   if [ "${2}" != "${3}" ]
@@ -136,7 +137,7 @@ main() {
     --master spark://"${SPARK_MASTER}" \
     --deploy-mode client \
     "${APP_HOME}"/lib/Spark-Partitioning-0.1-SNAPSHOT.jar \
-    hdfs://"${HADOOP_MASTER}${BASE_PATH}"
+    hdfs://"${HADOOP_MASTER}${BASE_PATH}" "${7}"
     ;;
   esac
 

@@ -66,7 +66,7 @@ private[tpch] trait TableOps {
     implicit spark: SparkSession
   ): Unit = {
     val dfWriter = if (configs.hasPath(s"$getTableName")) {
-      val numOfParts = configs.getInt(s"$getTableName.num_of_partitions")
+      val numOfParts = configs.getInt(s"$getTableName.output_parts")
       getRawTableDf(basePath, spark).repartition(numOfParts).write
     } else { getRawTableDf(basePath, spark).write }
 
@@ -77,10 +77,8 @@ private[tpch] trait TableOps {
     if (configs.hasPath(s"$getTableName")) {
       val refDf = spark.read
         .parquet(s"$basePath/tables/$getTableName" + "_hyperspace")
-      val colNames = configs.getStringList(s"$getTableName.partition_keys")
+      val colNames = configs.getStringList(s"$getTableName.index_keys")
       val proCols = configs.getStringList(s"$getTableName.projection_keys")
-      hyperspace.deleteIndex(s"$getTableName")
-      hyperspace.vacuumIndex(s"$getTableName")
       hyperspace.createIndex(
         refDf,
         IndexConfig(s"$getTableName", colNames, proCols)
@@ -104,7 +102,7 @@ private[tpch] trait TableOps {
     val rawDf = getRawTableDf(basePath, spark)
 
     val df = if (configs.hasPath(s"$getTableName")) {
-      val numOfParts = configs.getInt(s"$getTableName.num_of_partitions")
+      val numOfParts = configs.getInt(s"$getTableName.output_parts")
       rawDf.repartition(numOfParts)
     } else { rawDf.repartition() }
 
@@ -127,8 +125,8 @@ private[tpch] trait TableOps {
     val rawDf = getRawTableDf(basePath, spark)
 
     val dfWriter = if (configs.hasPath(s"$getTableName")) {
-      val colName = configs.getStringList(s"$getTableName.partition_keys").head
-      val numOfParts = configs.getInt(s"$getTableName.num_of_partitions")
+      val colName = configs.getStringList(s"$getTableName.index_keys").head
+      val numOfParts = configs.getInt(s"$getTableName.output_parts")
       rawDf
         .repartition()
         .write

@@ -1,4 +1,4 @@
-package edu.asu.sqlpartitioning.utils
+package edu.asu.utils
 
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._

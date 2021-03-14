@@ -1,7 +1,7 @@
 package edu.asu.hyperspacetest.experiments
 
-import edu.asu.sqlpartitioning.utils.ExtraOps.timedBlock
-import edu.asu.sqlpartitioning.utils.MatrixOps._
+import edu.asu.utils.ExtraOps.timedBlock
+import edu.asu.utils.MatrixOps._
 import org.apache.log4j.Logger
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
@@ -29,24 +29,9 @@ private[hyperspacetest] class E1(interNumParts: Int)(
    */
   def execute(basePath: String)(implicit log: Logger): Unit = {
 
-    val (_, timeToDisk: Long) = timedBlock {
+    val (_, timeToMultiply: Long) = timedBlock {
       val leftDF = spark.read.parquet(s"$basePath/common/left")
       val rightDF = spark.read.parquet(s"$basePath/common/right")
-
-      leftDF.write.parquet(s"$basePath/e1/left")
-      rightDF.write.parquet(s"$basePath/e1/right")
-    }
-
-    val dataTotalSeconds = timeToDisk / math.pow(10, 3)
-    val dataMinutes = (dataTotalSeconds / 60).toLong
-    val dataSeconds = (dataTotalSeconds % 60).toInt
-    log.info(
-      s"E1 -> Time to persist random data to disk is $dataMinutes minutes $dataSeconds seconds"
-    )
-
-    val (_, timeToMultiply: Long) = timedBlock {
-      val leftDF = spark.read.parquet(s"$basePath/e1/left")
-      val rightDF = spark.read.parquet(s"$basePath/e1/right")
 
       val res: DataFrame = leftDF.multiply(rightDF, interNumParts)
 
@@ -54,11 +39,9 @@ private[hyperspacetest] class E1(interNumParts: Int)(
     }
 
     val multiplyTotalSeconds = timeToMultiply / math.pow(10, 3)
-    val multiplyMinutes = (multiplyTotalSeconds / 60).toLong
-    val multiplySeconds = (multiplyTotalSeconds % 60).toInt
     log.info(
       s"E1 -> Time to multiply and persist result to disk " +
-        s"is $multiplyMinutes minutes $multiplySeconds seconds"
+        s"is $multiplyTotalSeconds seconds"
     )
   }
 

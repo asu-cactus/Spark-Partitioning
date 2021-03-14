@@ -22,7 +22,8 @@ object Main {
 
     implicit val log: Logger = Logger.getLogger("MatrixMultiplication")
 
-    val conf = new SparkConf().setAppName(s"sql_multiplication_$experiment")
+    val conf = new SparkConf()
+      .setAppName(s"hyperspace_multiplication_$experiment")
 
     implicit val spark: SparkSession =
       SparkSession

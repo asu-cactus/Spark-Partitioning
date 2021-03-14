@@ -19,12 +19,12 @@ input_checks() {
   # help for usage of the script
   if [ "$1" == "-h" ]; 
   then
-    echo "Usage: $(basename "${0}") {r1} {c1} {r2} {c2} {WORK_FLOW = (RDD, SPARK)} {BASE_PATH} {NUM_OF_PARTS}"
+    echo "Usage: $(basename "${0}") {r1} {c1} {r2} {c2} {WORK_FLOW = (RDD, SPARK)} {BASE_PATH} {NUM_OF_PARTS} {DENSITY}"
     exit 0
   fi
 
   # checking if the number of args to the script are proper
-  if [ $# -lt 6 ]
+  if [ $# -lt 8 ]
   then
     echo "Missing Operand"
     echo "Run $(basename "${0}") -h for usage"
@@ -39,6 +39,7 @@ input_checks() {
   echo "Work Flow - ${5}"
   echo "Base Path - ${6}"
   echo "Num of Parts - ${7}"
+  echo "DENSITY - ${8}"
   
   # checking if c1 == r2 which is required for matrix multiplication
   if [ "${2}" != "${3}" ]
@@ -104,7 +105,8 @@ main() {
   check_HDFS_directories "${BASE_PATH}"
 
   # creating the matrices with the python file
-  python3 "${APP_HOME}"/python/random_generator.py "${1}" "${2}" "${3}" "${4}"
+  python3 "${APP_HOME}"/python/random_generator.py \
+  "${1}" "${2}" "${3}" "${4}" "${8}"
 
   # loading the left and right matrices into the HDFS
   hdfs dfs -put -f "${PWD}"/left_matrix.txt "${BASE_PATH}"/raw/left/

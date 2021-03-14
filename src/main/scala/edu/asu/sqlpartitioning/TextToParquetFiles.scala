@@ -1,6 +1,6 @@
 package edu.asu.sqlpartitioning
 
-import edu.asu.sqlpartitioning.utils.Parser.readMatrix
+import edu.asu.utils.Parser.readMatrix
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 

@@ -22,22 +22,23 @@ def main():
     c1 = int(args[2])
     r2 = int(args[3])
     c2 = int(args[4])
-
-    sl = random(r1, c1, density=1.0, random_state=rs, data_rvs=rvs)
+    density_frac = float(args[5])
 
     with open("left_matrix.txt", "w") as text_file:
-        for x in range(sl.row.size):
-            text_file.write(
-                str(sl.row[x]) + ',' + str(sl.col[x]) + ',' + str(
-                    sl.data[x]) + "\n")
-
-    sr = random(r2, c2, density=1.0, random_state=rs, data_rvs=rvs)
+        for row_index in range(0, r1):
+            sl = random(1, c1, density=density_frac, random_state=rs, data_rvs=rvs)
+            for x in range(sl.row.size):
+                text_file.write(
+                    str(row_index) + ',' + str(sl.col[x]) + ',' + str(
+                        sl.data[x]) + "\n")
 
     with open("right_matrix.txt", "w") as text_file:
-        for x in range(sr.row.size):
-            text_file.write(
-                str(sr.row[x]) + ',' + str(sr.col[x]) + ',' + str(
-                    sr.data[x]) + "\n")
+        for col_index in range(0, c2):
+            sr = random(r2, 1, density=density_frac, random_state=rs, data_rvs=rvs)
+            for x in range(sr.row.size):
+                text_file.write(
+                    str(sr.row[x]) + ',' + str(col_index) + ',' + str(
+                        sr.data[x]) + "\n")
 
 
 if __name__ == "__main__":

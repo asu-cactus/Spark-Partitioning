@@ -40,7 +40,7 @@ Copy the `tar.gz` file to the cluster and decompress the folder.
 `nohup ./bin/load_data.sh ${ROW_LEFT} {COL_LEFT} ${ROW_RIGHT} ${COL_RIGHT} ${WORK_FLOW = (RDD, SQL)} ${BASE_PATH} ${NUM_OF_PARTS} > logs/load_data.log &`.
 
 3. To execute a particular experiment, execute the shell script 
-`nohup ./bin/run_experiment.sh ${WORK_FLOW = (RDD, SQL, BUCKET, HIVE)} ${BASE_PATH} ${EXPERIMENT} ${NUM_OF_PARTITIONS} > logs/job_${EXPERIMENT}_${PARTITIONS}.log &`.
+`nohup ./bin/run_experiment.sh ${WORK_FLOW = (RDD, SQL, BUCKET, HIVE, INDEXED)} ${BASE_PATH} ${EXPERIMENT} ${NUM_OF_PARTITIONS} > logs/job_${EXPERIMENT}_${PARTITIONS}.log &`.
 Allowed values for `${EXPERIMENT}` are `e1`, `e2` or `e3`. NOTE: With `BUCKET` type workload `e3` experiment is not valid.
 
 #### Steps to execute the experiment for Page Rank.

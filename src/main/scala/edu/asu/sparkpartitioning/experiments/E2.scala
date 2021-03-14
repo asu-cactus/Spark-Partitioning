@@ -1,6 +1,6 @@
 package edu.asu.sparkpartitioning.experiments
 
-import edu.asu.sparkpartitioning.utils.ExtraOps.timedBlock
+import edu.asu.utils.ExtraOps.timedBlock
 import edu.asu.sparkpartitioning.utils.MatrixOps._
 import org.apache.log4j.Logger
 import org.apache.spark.{Partitioner, SparkContext}

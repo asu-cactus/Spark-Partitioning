@@ -1,7 +1,7 @@
 package edu.asu.sqlbucketing.experiments
 
-import edu.asu.sqlpartitioning.utils.ExtraOps.timedBlock
-import edu.asu.sqlpartitioning.utils.MatrixOps._
+import edu.asu.utils.ExtraOps.timedBlock
+import edu.asu.utils.MatrixOps._
 import org.apache.log4j.Logger
 import org.apache.spark.sql.SparkSession
 

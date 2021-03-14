@@ -1,4 +1,4 @@
-package edu.asu.sparkpartitioning.utils
+package edu.asu.utils
 
 object ExtraOps {
 

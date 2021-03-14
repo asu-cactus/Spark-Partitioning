@@ -1,7 +1,8 @@
 package edu.asu.hyperspacetest.experiments
 
-import edu.asu.sqlpartitioning.utils.ExtraOps.timedBlock
-import edu.asu.sqlpartitioning.utils.MatrixOps._
+import edu.asu.utils.ExtraOps.timedBlock
+import edu.asu.utils.MatrixOps._
+
 import org.apache.log4j.Logger
 import org.apache.spark.sql.SparkSession
 
@@ -33,6 +34,8 @@ private[hyperspacetest] class E2(interNumParts: Int)(
     implicit log: Logger
   ): Unit = {
 
+    spark.enableHyperspace()
+
     val (_, timeToDisk: Long) = timedBlock {
 
       val hyperspace: Hyperspace = Hyperspace()
@@ -56,10 +59,9 @@ private[hyperspacetest] class E2(interNumParts: Int)(
     )
 
     val (_, timeToMultiply: Long) = timedBlock {
-      spark.enableHyperspace()
 
-      val leftDF = spark.read.parquet(s"$basePath/e2/left")
-      val rightDF = spark.read.parquet(s"$basePath/e2/right")
+      val leftDF = spark.read.parquet(s"$basePath/common/left")
+      val rightDF = spark.read.parquet(s"$basePath/common/right")
 
       val res = leftDF.multiply(rightDF, interNumParts)
 

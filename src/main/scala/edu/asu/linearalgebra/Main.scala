@@ -8,7 +8,7 @@ object Main {
 
   def main(args: Array[String]): Unit = {
 
-    if (args.length != 4) {
+    if (args.length != 2) {
       throw new IllegalArgumentException(
         "Base path for storing data and  type of execution " +
           "is expected." +
@@ -18,8 +18,6 @@ object Main {
 
     val basePath = args(0)
     val experimentType = args(1)
-    val blockRow = args(2).toInt
-    val blockCol = args(3).toInt
 
     implicit val log: Logger = Logger.getLogger("LinearAlgebraTest")
 
@@ -32,7 +30,7 @@ object Main {
         .config(conf)
         .getOrCreate()
 
-    new Plain(blockRow, blockCol).execute(basePath)
+    new Plain().execute(basePath)
   }
 
 }

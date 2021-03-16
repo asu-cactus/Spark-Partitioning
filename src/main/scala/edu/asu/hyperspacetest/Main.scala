@@ -1,6 +1,6 @@
 package edu.asu.hyperspacetest
 
-import edu.asu.hyperspacetest.experiments.{E1, E2}
+import edu.asu.hyperspacetest.experiments.{E1, E2, E3}
 import org.apache.log4j.Logger
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.SparkConf
@@ -34,7 +34,7 @@ object Main {
     experiment match {
       case "e1" => new E1(numOfParts).execute(basePath)
       case "e2" => new E2(numOfParts).execute(basePath)
-
+      case "e3" => new E3(numOfParts).execute(basePath)
     }
   }
 

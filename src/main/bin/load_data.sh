@@ -28,7 +28,7 @@ input_checks() {
   then
     echo "Missing Operand"
     echo "Run $(basename "${0}") -h for usage"
-    exit 0
+    exit 1
   fi
 
   echo "Your Input :- "
@@ -46,7 +46,7 @@ input_checks() {
   then 
     echo "Error: c1 and r2 should be equal for matrix multiplication"
     echo "Run $(basename "${0}") -h for usage"
-    exit 0
+    exit 1
   fi
 }
 

@@ -58,14 +58,14 @@ object RawToParquet {
     Supplier.rawToParquetWithParts(basePath, configs)
 
     // Parse and write to Hive tables with buckets on given key
-    Customer.rawToTableWithBuckets(basePath, configs)
-    Lineitem.rawToTableWithBuckets(basePath, configs)
-    Nation.rawToTableWithBuckets(basePath, configs)
-    Orders.rawToTableWithBuckets(basePath, configs)
-    Part.rawToTableWithBuckets(basePath, configs)
-    Partsupp.rawToTableWithBuckets(basePath, configs)
-    Region.rawToTableWithBuckets(basePath, configs)
-    Supplier.rawToTableWithBuckets(basePath, configs)
+//    Customer.rawToTableWithBuckets(basePath, configs)
+//    Lineitem.rawToTableWithBuckets(basePath, configs)
+//    Nation.rawToTableWithBuckets(basePath, configs)
+//    Orders.rawToTableWithBuckets(basePath, configs)
+//    Part.rawToTableWithBuckets(basePath, configs)
+//    Partsupp.rawToTableWithBuckets(basePath, configs)
+//    Region.rawToTableWithBuckets(basePath, configs)
+//    Supplier.rawToTableWithBuckets(basePath, configs)
   }
 
   /**

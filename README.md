@@ -62,6 +62,9 @@ in `Custom` class use `${QUERY_NUM}=custom`. Allowed values for `${PARTITION_TYP
 are `hyperspace`, `parts` and `buckets`. You are required to clear the hyperspace indexes, if there are any with same names previously created.
 `{NUM_OF_PARTS}` is used to set the value for the spark configuration `spark.sql.shuffle.partitions`.
 
+* _NOTE_: Currently the option to execute with `buckets` (`hive`) is commented as the current testing
+scenarios create large number of buckets which is undesirable and performs worse.
+
 4. Partitioning and bucketing keys are configurable by editing the `tpch.conf` file available
 in the `etc` directory within the package or in `src/resources/configurations` within the source code.
 Spark SQL `DataFrames` have case sensitive column names, all the column names are in `uppercase`.

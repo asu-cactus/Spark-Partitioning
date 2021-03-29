@@ -2,6 +2,8 @@ package edu.asu.linearalgebra
 
 import org.apache.log4j.Logger
 import org.apache.spark.SparkConf
+import org.apache.spark.mllib.linalg.distributed.MatrixEntry
+import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
 object Main {
@@ -23,6 +25,12 @@ object Main {
 
     val conf = new SparkConf()
       .setAppName(s"algebra_multiplication_$experimentType")
+      .registerKryoClasses(
+        Array(
+          classOf[MatrixEntry],
+          classOf[RDD[MatrixEntry]]
+        )
+      )
 
     implicit val spark: SparkSession =
       SparkSession

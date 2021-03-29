@@ -30,14 +30,9 @@ class Plain()(implicit spark: SparkSession) {
         )
       )
 
-    val leftMat = new CoordinateMatrix(leftRow).toBlockMatrix.cache
-    val rightMat = new CoordinateMatrix(rightRow).toBlockMatrix.cache
+    val leftMat = new CoordinateMatrix(leftRow).toBlockMatrix
+    val rightMat = new CoordinateMatrix(rightRow).toBlockMatrix
 
-    leftMat.cache()
-    rightMat.cache()
-    // To trigger the caching
-    leftMat.blocks.count()
-    rightMat.blocks.count()
     // Transformation stage for multiplication operation
     val res = leftMat.multiply(rightMat)
     // To trigger the multiplication operation
